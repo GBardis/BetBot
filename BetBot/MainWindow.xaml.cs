@@ -30,8 +30,8 @@ namespace BetBot
         public static IWebDriver midas = new FirefoxDriver();
         Dictionary<string, string> dict = new Dictionary<string, string>();
         Navigation nav = new Navigation();
-        
-        
+        private readonly IEnumerable<string[]> dictionary;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -40,11 +40,11 @@ namespace BetBot
             midas.Navigate().GoToUrl("http://www.bet365.gr/#/HO");
             IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
             element.Click();
-            var dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
+            dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
             foreach (string[] e in dictionary)
             {
                 dict.Add(e[0].ToString(), e[1].ToString());
-            }           
+            }
         }
 
         private void Navigate_Click(object sender, RoutedEventArgs e)
@@ -52,10 +52,15 @@ namespace BetBot
             BetBurger burger = new BetBurger();
             burger.scrapBurger();
             divNav leftNav = new divNav();
+            // navigate to betcategories
             clickResponse("Ποδόσφαιρο", "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
-            nav.closeAllOpenDivs();           
+            // close all divs inside a category 
+            nav.closeAllOpenDivs();
+            // Find Country
             clickResponse("Ην. Βασίλειο", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
+            // Find Division 
             clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
+            // Select Match
             clickResponse("Άρσεναλ v Λέστερ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
         }
 
@@ -63,12 +68,12 @@ namespace BetBot
         {
             if (!leftNav.fetchLeftNav(clickName, path))
             {
-                errorLabel.Content =clickName + " Not Found!";
+                errorLabel.Content = clickName + " Not Found!";
             }
             else
             {
-                errorLabel.Content =  clickName;
+                errorLabel.Content = clickName;
             }
-        }        
+        }
     }
 }
