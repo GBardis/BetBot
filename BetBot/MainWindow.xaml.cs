@@ -16,9 +16,7 @@ using System.Windows.Shapes;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support;
 using System.IO;
-
-
-
+using OpenQA.Selenium.Support.Events;
 
 namespace BetBot
 {
@@ -28,10 +26,14 @@ namespace BetBot
     public partial class MainWindow : Window
     {
         public static IWebDriver midas = new FirefoxDriver();
+        //public static EventFiringWebDriver firingMidas = new EventFiringWebDriver(midas);
         Dictionary<string, string> dict = new Dictionary<string, string>();
         Navigation nav = new Navigation();
         private readonly IEnumerable<string[]> dictionary;
-
+        BetBurger burger = new BetBurger();
+        List<BetList> betList = new List<BetList>();
+        //placedBets functionality
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -45,12 +47,23 @@ namespace BetBot
             {
                 dict.Add(e[0].ToString(), e[1].ToString());
             }
+            //BetBurger.burgerMidas.ScriptExecuted += new EventHandler<WebDriverScriptEventArgs>(firingDriver_ScriptExecuted);
+            //BetBurger.burgerMidas.ElementClicked += new EventHandler<WebElementEventArgs>(firingDriver_ButtonClicked);
         }
-
+        //private void firingDriver_ScriptExecuted(object sender, WebDriverScriptEventArgs e)
+        //{
+        //    // do action required to handle what happens after clicking button you have mentioned.
+        //    errorLabel.Content = "BOOM";
+        //}
+        //private void firingDriver_ButtonClicked(object sender, WebElementEventArgs e)
+        //{
+        //    // do action required to handle what happens after clicking button you have mentioned.
+        //    errorLabel.Content = "Zoom";
+        //}
         private void Navigate_Click(object sender, RoutedEventArgs e)
         {
-            BetBurger burger = new BetBurger();
-            burger.scrapBurger();
+            
+            burger.ScrapBurger();
             divNav leftNav = new divNav();
             // navigate to betcategories
             clickResponse("Ποδόσφαιρο", "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
@@ -62,18 +75,31 @@ namespace BetBot
             clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
             // Select Match
             clickResponse("Άρσεναλ v Λέστερ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
+            
+            
         }
 
         private void clickResponse(string clickName, string path, divNav leftNav)
         {
             if (!leftNav.fetchLeftNav(clickName, path))
             {
-                errorLabel.Content = clickName + " Not Found!";
+                //errorLabel.Content = clickName + " Not Found!";
             }
             else
             {
-                errorLabel.Content = clickName;
+               // errorLabel.Content = clickName;
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            betList = burger.GetArbsToJson();
+            BetBurger.betList.Clear();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            burger.DummyClick();
         }
     }
 }

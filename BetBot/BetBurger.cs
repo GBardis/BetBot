@@ -5,64 +5,93 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support;
-using System.Collections;
+using Newtonsoft.Json;
+using Json;
+using Newtonsoft.Json.Linq;
+using OpenQA.Selenium.Support.Events;
+using System.IO;
 
 namespace BetBot
 {
     class BetBurger
     {
-        IWebDriver burgerMidas = new FirefoxDriver();
-        private List<IWebElement> arbs = new List<IWebElement>();
-        private List<IWebElement> divisions = new List<IWebElement>();
-        private List<IWebElement> games = new List<IWebElement>();
-        private List<IWebElement> categories = new List<IWebElement>();
-        private List<IWebElement> tree = new List<IWebElement>();
-        private List<IWebElement> betcompanies;
+        public static IWebDriver burgerMidas = new FirefoxDriver();
+        //public static EventFiringWebDriver burgerMidas = new EventFiringWebDriver(bMidas);
+        List<dynamic> responses = new List<dynamic>();
+        //List<string> fileWriteResponses = new List<string>();
+        List<IWebElement> jsonArbs = new List<IWebElement>();
+        public static List<BetList> betList = new List<BetList>();
+        BetList simpleBet = new BetList();
+        JToken j;        
+        string url;
+        string[] words;
+        dynamic response;
         private Dictionary<int, string[]> bets = new Dictionary<int, string[]>();
-        private IWebElement arb;
-        private IWebElement prematch;
-        public void scrapBurger()
+        private IWebElement okCookieClick, prematchLinkClick;
+
+
+
+        public void ScrapBurger()
         {
             burgerMidas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(120);
             burgerMidas.Navigate().GoToUrl("https://www.betburger.com/gr/");
-            arb = burgerMidas.FindElement(By.XPath("html/body/div[1]/div/a[1]"));
+            okCookieClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div/a[1]"));
             System.Threading.Thread.Sleep(1000);
-            arb.Click();
-            prematch = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
-            prematch.Click();
-            getdata();
+            okCookieClick.Click();
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
+            prematchLinkClick.Click();            
         }
-        public void getdata()
-        {
-            games = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[3]/div/div/div/div/div[1]/div/a")).ToList<IWebElement>();
-            divisions = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[3]/div/div/div/div/div[1]/small")).ToList<IWebElement>();
-            arbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[4]/div/div/a")).ToList<IWebElement>();
-            categories = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[2]/div/div/*")).ToList<IWebElement>();
-            betcompanies = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[2]/div/div[1]/div/div/div/div/div/a")).ToList<IWebElement>();
 
-            int i = 0;
-            foreach (IWebElement betcompany in betcompanies)
+        public void DummyClick()
+        {
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/nav/div/div[2]/ul/li[2]/a"));
+            prematchLinkClick.Click();
+        }
+
+        public List<BetList> GetArbsToJson()
+        {
+            jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
+            foreach (IWebElement jsonArb in jsonArbs)
             {
-                foreach (IWebElement game in games)
+                url = jsonArb.GetAttribute("href");
+                url = Uri.UnescapeDataString(url);
+                url = url.Substring(url.IndexOf('#') + 1);
+                j = JToken.Parse(url);
+                response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
+                try
                 {
-                    foreach (IWebElement division in divisions)
+                    for (int i = 0; i < response.bets.Count; i++)
                     {
-                        foreach (IWebElement arbs in arbs)
+                        if (response.bets[i].bookmaker_id == "10")
                         {
-                            // if (betcompany.Text == "Bet365" || betcompany.Text == "Pinnacle"))
-                            //   {
-                            bets.Add(i, new[] { betcompany.Text.ToString(), game.Text.ToString(), division.Text.ToString(), arbs.Text.ToString() });
-                            i++;
-                            //  }
-                            break;
+                            responses.Add(response.bets[i]);
+                            //fileWriteResponses.Add(response.bets[i].home.ToString());
+                            simpleBet.arbId = response.arb.id.ToString();
+                            simpleBet.eventName = response.arb.event_name.ToString();                            
+                            simpleBet.league = response.arb.league.ToString();
+                            words = simpleBet.league.Split('.');
+                            simpleBet.parentDiv = words[0];
+                            simpleBet.childDiv = words[1];
+                            simpleBet.sportId = response.arb.sport_id.ToString();
+                            simpleBet.sportName = response.arb.sport.name.ToString();
+                            simpleBet.betId = response.bets[i].id.ToString();
+                            simpleBet.koef = response.bets[i].koef.ToString();
+                            simpleBet.home = response.bets[i].home.ToString();
+                            simpleBet.away = response.bets[i].away.ToString();
+                            simpleBet.betType = response.bets[i].bet_combination.title.ToString();
+                            simpleBet.bookmakerId = response.bets[i].bookmaker_id;
+                            simpleBet.countryId = response.arb.country_id;
+                            betList.Add(simpleBet);
                         }
-                        break;
                     }
-                    break;
+                }
+                catch (Exception ex)
+                {
+
                 }
             }
+            //File.WriteAllLines("fuck.txt",betList);
+            return betList;            
         }
     }
 }
