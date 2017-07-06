@@ -26,7 +26,6 @@ namespace BetBot
         BetList simpleBet = new BetList();
         JToken j;
         string url;
-        string[] words = new string[2];
         dynamic response;
         private Dictionary<int, string[]> bets = new Dictionary<int, string[]>();
         private IWebElement okCookieClick, prematchLinkClick;
@@ -52,7 +51,7 @@ namespace BetBot
         {
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
             List<string> divisions = FindBetDivision();
-
+            string[] words = new string[2];
             foreach (IWebElement jsonArb in jsonArbs)
             {
                 url = jsonArb.GetAttribute("href");
@@ -103,8 +102,6 @@ namespace BetBot
             List<int> betcompanyindexes = new List<int>();
             List<string> betcompanydivisions = new List<string>();
 
-
-            //  List<int> indexes = new List<int>();
             betcompanies = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[1]/div/div/div/div/div/a")).ToList<IWebElement>();
             divisions = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[3]/div/div/div/div/div[1]/small")).ToList<IWebElement>();
 
@@ -113,7 +110,7 @@ namespace BetBot
                 title = betcompany.GetAttribute("title");
                 if (title == "Bet365")
                 {
-                    index = betcompanies.IndexOf(betcompany);
+                    index = betcompanies.IndexOf(betcompany) + 1;
                     betcompanyindexes.Add(index);
                 }
                 else
@@ -121,20 +118,27 @@ namespace BetBot
                     betcompanyindexes.Add(0);
                 }
             }
-
+            int temp = 0;
             foreach (IWebElement division in divisions)
             {
-                foreach (int betcompanyindex in betcompanyindexes)
+                index = divisions.IndexOf(division) + 1;
+                for (int i = temp; i <= betcompanyindexes.Count; i++)
                 {
-                    index = divisions.IndexOf(division) + 1;
-                    if (betcompanyindex == index)
+                    if (betcompanyindexes[i] == index)
                     {
                         betcompanydivisions.Add(division.Text);
+                        temp = temp + 1;
                         break;
                     }
-                    break;
-                }
+                    else
+                    {
+                        temp = temp + 1;
+                        // betcompanydivisions.Add("");
+                        break;
+                    }
 
+                }
+                //  var newlist = betcompanydivisions.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();            
             }
             return betcompanydivisions;
         }
