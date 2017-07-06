@@ -122,7 +122,7 @@ namespace BetBot
             foreach (IWebElement division in divisions)
             {
                 index = divisions.IndexOf(division) + 1;
-                for (int i = temp; i <= betcompanyindexes.Count; i++)
+                for (int i = temp; i <= betcompanyindexes.Count;)
                 {
                     if (betcompanyindexes[i] == index)
                     {
@@ -133,12 +133,9 @@ namespace BetBot
                     else
                     {
                         temp = temp + 1;
-                        // betcompanydivisions.Add("");
                         break;
                     }
-
                 }
-                //  var newlist = betcompanydivisions.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();            
             }
             return betcompanydivisions;
         }

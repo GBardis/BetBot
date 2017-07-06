@@ -66,7 +66,7 @@ namespace BetBot
             burger.ScrapBurger();
             divNav leftNav = new divNav();
             List<string> betcat = new List<string>();
-     
+
             //betcat = betcompanydivisions;
             betList = burger.GetArbsToJson();
 
