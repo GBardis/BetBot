@@ -33,13 +33,13 @@ namespace BetBot
         BetBurger burger = new BetBurger();
         List<BetList> betList = new List<BetList>();
         //placedBets functionality
-        
+
         public MainWindow()
         {
             InitializeComponent();
             //driver.Manage().Window.Maximize();
             midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
-            midas.Navigate().GoToUrl("http://www.bet365.gr/#/HO");
+            midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
             IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
             element.Click();
             dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
@@ -62,21 +62,28 @@ namespace BetBot
         //}
         private void Navigate_Click(object sender, RoutedEventArgs e)
         {
-            
+
             burger.ScrapBurger();
             divNav leftNav = new divNav();
-            // navigate to betcategories
-            clickResponse("Ποδόσφαιρο", "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
-            // close all divs inside a category 
-            nav.closeAllOpenDivs();
-            // Find Country
-            clickResponse("Ην. Βασίλειο", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
-            // Find Division 
-            clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
-            // Select Match
-            clickResponse("Άρσεναλ v Λέστερ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
-            
-            
+            List<string> betcat = new List<string>();
+     
+            //betcat = betcompanydivisions;
+            betList = burger.GetArbsToJson();
+
+            foreach (var bet in betList)
+            {
+                // navigate to betcategories
+                clickResponse(bet.sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
+                // close all divs inside a category 
+                nav.closeAllOpenDivs();
+                // Find Country
+                clickResponse("Ην. Βασίλειο", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
+                // Find Division 
+                clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
+                // Select Match
+                clickResponse(bet.eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
+
+            }
         }
 
         private void clickResponse(string clickName, string path, divNav leftNav)
@@ -87,7 +94,7 @@ namespace BetBot
             }
             else
             {
-               // errorLabel.Content = clickName;
+                // errorLabel.Content = clickName;
             }
         }
 
