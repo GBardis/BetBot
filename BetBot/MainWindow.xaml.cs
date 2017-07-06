@@ -17,6 +17,8 @@ using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support;
 using System.IO;
 using OpenQA.Selenium.Support.Events;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace BetBot
 {
@@ -31,9 +33,9 @@ namespace BetBot
         Navigation nav = new Navigation();
         private readonly IEnumerable<string[]> dictionary;
         BetBurger burger = new BetBurger();
-        List<BetList> betList = new List<BetList>();
+        ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
         //placedBets functionality
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -47,22 +49,24 @@ namespace BetBot
             {
                 dict.Add(e[0].ToString(), e[1].ToString());
             }
+
+            BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
+            // betList.Add(new BetList());
             //BetBurger.burgerMidas.ScriptExecuted += new EventHandler<WebDriverScriptEventArgs>(firingDriver_ScriptExecuted);
             //BetBurger.burgerMidas.ElementClicked += new EventHandler<WebElementEventArgs>(firingDriver_ButtonClicked);
         }
-        //private void firingDriver_ScriptExecuted(object sender, WebDriverScriptEventArgs e)
-        //{
-        //    // do action required to handle what happens after clicking button you have mentioned.
-        //    errorLabel.Content = "BOOM";
-        //}
-        //private void firingDriver_ButtonClicked(object sender, WebElementEventArgs e)
-        //{
-        //    // do action required to handle what happens after clicking button you have mentioned.
-        //    errorLabel.Content = "Zoom";
-        //}
+
+        private void CollectionChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                MessageBox.Show("Added value");
+            }
+        }
+        
         private void Navigate_Click(object sender, RoutedEventArgs e)
         {
-            
+
             burger.ScrapBurger();
             divNav leftNav = new divNav();
             // navigate to betcategories
@@ -75,8 +79,8 @@ namespace BetBot
             clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
             // Select Match
             clickResponse("Άρσεναλ v Λέστερ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
-            
-            
+
+
         }
 
         private void clickResponse(string clickName, string path, divNav leftNav)
@@ -87,7 +91,7 @@ namespace BetBot
             }
             else
             {
-               // errorLabel.Content = clickName;
+                // errorLabel.Content = clickName;
             }
         }
 
@@ -95,11 +99,35 @@ namespace BetBot
         {
             betList = burger.GetArbsToJson();
             BetBurger.betList.Clear();
+            betList.Add(new BetList());
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             burger.DummyClick();
         }
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+        }
     }
 }
+
+
+
+
+//private void firingDriver_ScriptExecuted(object sender, WebDriverScriptEventArgs e)
+//{
+//    // do action required to handle what happens after clicking button you have mentioned.
+//    errorLabel.Content = "BOOM";
+//}
+//private void firingDriver_ButtonClicked(object sender, WebElementEventArgs e)
+//{
+//    // do action required to handle what happens after clicking button you have mentioned.
+//    errorLabel.Content = "Zoom";
+//}
+
+
+
+

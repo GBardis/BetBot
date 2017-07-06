@@ -10,6 +10,7 @@ using Json;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium.Support.Events;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace BetBot
 {
@@ -20,7 +21,7 @@ namespace BetBot
         List<dynamic> responses = new List<dynamic>();
         //List<string> fileWriteResponses = new List<string>();
         List<IWebElement> jsonArbs = new List<IWebElement>();
-        public static List<BetList> betList = new List<BetList>();
+        public static ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
         BetList simpleBet = new BetList();
         JToken j;        
         string url;
@@ -48,7 +49,7 @@ namespace BetBot
             prematchLinkClick.Click();
         }
 
-        public List<BetList> GetArbsToJson()
+        public ObservableCollection<BetList> GetArbsToJson()
         {
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
             foreach (IWebElement jsonArb in jsonArbs)
@@ -62,8 +63,8 @@ namespace BetBot
                 {
                     for (int i = 0; i < response.bets.Count; i++)
                     {
-                        if (response.bets[i].bookmaker_id == "10")
-                        {
+                        //if (response.bets[i].bookmaker_id == "10")
+                        //{
                             responses.Add(response.bets[i]);
                             //fileWriteResponses.Add(response.bets[i].home.ToString());
                             simpleBet.arbId = response.arb.id.ToString();
@@ -82,7 +83,7 @@ namespace BetBot
                             simpleBet.bookmakerId = response.bets[i].bookmaker_id;
                             simpleBet.countryId = response.arb.country_id;
                             betList.Add(simpleBet);
-                        }
+                        //}
                     }
                 }
                 catch (Exception ex)

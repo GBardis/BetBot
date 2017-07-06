@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BetBot
 {
-    class BetList
+    class BetList 
     {
         public string arbId;
         public string eventName;
