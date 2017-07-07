@@ -24,6 +24,7 @@ namespace BetBot
         List<dynamic> responses = new List<dynamic>();
         //List<string> fileWriteResponses = new List<string>();
         List<IWebElement> jsonArbs = new List<IWebElement>();
+        List<IWebElement> jsonArbsTemp = new List<IWebElement>();
         public static ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
         BetList simpleBet = new BetList();
         JToken j;
@@ -31,6 +32,11 @@ namespace BetBot
         dynamic response;
         private Dictionary<int, string[]> bets = new Dictionary<int, string[]>();
         private IWebElement okCookieClick, prematchLinkClick;
+        List<IWebElement> divisions = new List<IWebElement>();
+        List<IWebElement> betCompanies = new List<IWebElement>();
+        List<int> betCompanyIndexes = new List<int>();
+        List<string> betCompanyDivisions = new List<string>();
+        List<string> divisionsList = new List<string>();
 
         public void ScrapBurger()
         {
@@ -41,6 +47,17 @@ namespace BetBot
             okCookieClick.Click();
             prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
             prematchLinkClick.Click();
+            //LOGIN!
+            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[6]/a"));
+            //prematchLinkClick.Click();
+            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[1]/input"));
+            //prematchLinkClick.SendKeys("con.kokkinis@gmail.com");
+            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[2]/input"));
+            //prematchLinkClick.SendKeys("6983868418");
+            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[4]/button"));
+            //prematchLinkClick.Click();
+            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
+            //prematchLinkClick.Click();
         }
 
         public void DummyClick()
@@ -51,9 +68,14 @@ namespace BetBot
 
         public ObservableCollection<BetList> GetArbsToJson()
         {
+            betList.Clear();
+            responses.Clear();
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
-            List<string> divisions = FindBetDivision();
+
+            divisionsList.Clear();
+            divisionsList = FindBetDivision();
             string[] words = new string[2];
+            int jj = 0;
             foreach (IWebElement jsonArb in jsonArbs)
             {
                 url = jsonArb.GetAttribute("href");
@@ -66,81 +88,54 @@ namespace BetBot
                 {
                     if (response.bets[i].bookmaker_id == "10")
                     {
-
                         responses.Add(response.bets[i]);
                         //fileWriteResponses.Add(response.bets[i].home.ToString());
                         simpleBet.arbId = response.arb.id.ToString();
-                        simpleBet.eventName = response.arb.event_name.ToString().Replace("-", "v");
-
-                        foreach (string division in divisions)
-                        {
-                            simpleBet.league = division;
-                            words = simpleBet.league.Split('.');
-                            simpleBet.parentDiv = words[0];
-                            simpleBet.childDiv = words[1];
-                            break;
-                        }
+                        simpleBet.league = divisionsList[jj];
+                        words = divisionsList[jj].Split('.');
+                        simpleBet.parentDiv = words[0];
+                        if (words.Length > 1) simpleBet.childDiv = words[1].Substring(1, (words[1].Length - 1));
+                        jj++;
                         simpleBet.sportId = response.arb.sport_id.ToString();
                         simpleBet.sportName = response.arb.sport.name.ToString();
                         simpleBet.betId = response.bets[i].id.ToString();
                         simpleBet.koef = response.bets[i].koef.ToString();
                         simpleBet.home = response.bets[i].home.ToString();
                         simpleBet.away = response.bets[i].away.ToString();
+                        simpleBet.eventName = simpleBet.home + " v " + simpleBet.away;
                         simpleBet.betType = response.bets[i].bet_combination.title.ToString();
                         simpleBet.bookmakerId = response.bets[i].bookmaker_id;
                         simpleBet.countryId = response.arb.country_id;
-                        betList.Add(simpleBet);
+                        betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType));
+
                     }
                 }
             }
+            jsonArbsTemp = jsonArbs;
             //File.WriteAllLines("fuck.txt",betList);
             return betList;
         }
+
         public List<string> FindBetDivision()
         {
-            string title;
-            int index;
-            List<IWebElement> divisions = new List<IWebElement>();
-            List<IWebElement> betcompanies = new List<IWebElement>();
-            List<int> betcompanyindexes = new List<int>();
-            List<string> betcompanydivisions = new List<string>();
-
-            betcompanies = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[1]/div/div/div/div/div/a")).ToList<IWebElement>();
+            betCompanies = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[1]/div/div/div/div/div/a")).ToList<IWebElement>();
             divisions = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[3]/div/div/div/div/div[1]/small")).ToList<IWebElement>();
 
-            foreach (IWebElement betcompany in betcompanies)
+            for (int i = 0; i < betCompanies.Count; i++)
             {
-                title = betcompany.GetAttribute("title");
-                if (title == "Bet365")
+                if (betCompanies[i].Text == "Bet365")
                 {
-                    index = betcompanies.IndexOf(betcompany) + 1;
-                    betcompanyindexes.Add(index);
-                }
-                else
-                {
-                    betcompanyindexes.Add(0);
-                }
-            }
-            int temp = 0;
-            foreach (IWebElement division in divisions)
-            {
-                index = divisions.IndexOf(division) + 1;
-                for (int i = temp; i <= betcompanyindexes.Count;)
-                {
-                    if (betcompanyindexes[i] == index)
+                    try
                     {
-                        betcompanydivisions.Add(division.Text);
-                        temp = temp + 1;
-                        break;
+                        betCompanyDivisions.Add(divisions[i].Text);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        temp = temp + 1;
-                        break;
+                        MessageBox.Show("ERROR");
                     }
                 }
             }
-            return betcompanydivisions;
+            return betCompanyDivisions;
         }
     }
 }

@@ -13,9 +13,9 @@ namespace BetBot
     {
 
         List<IWebElement> elements = new List<IWebElement>();
-        public void closeAllOpenDivs()
+        public void closeAllOpenDivs(string selector)
         {
-            elements = MainWindow.midas.FindElements(By.CssSelector(".sm-Market_HeaderOpen")).ToList<IWebElement>();
+            elements = MainWindow.midas.FindElements(By.CssSelector(selector)).ToList<IWebElement>();
             foreach (IWebElement element in elements)
             {
                 try
@@ -25,9 +25,9 @@ namespace BetBot
                 catch (InvalidOperationException)
                 {
                     //element.Click();
-
                 }
             }
         }
     }
 }
+//".sm-Market_HeaderOpen"

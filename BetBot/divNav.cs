@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
@@ -21,14 +20,21 @@ namespace BetBot
             //elements = MainWindow.driver.FindElements(By.XPath(""));
             //string path = "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div";
             elements = MainWindow.midas.FindElements(By.XPath(path)).ToList<IWebElement>();
+
             if (elements.Count > 0)
             {
                 foreach (IWebElement element in elements)
                 {
-                    if (element.Text == clickName)
+                    try
                     {
-                        element.Click();
-                        break;
+                        if (element.Text.ToLower().Replace(" ", "").Replace("-","").Replace("&", "") == clickName.ToLower().Replace(" ", "").Replace("-", "").Replace("&", ""))
+                        {
+                            element.Click();
+                            break;
+                        }
+                    }catch (Exception ex)
+                    {
+
                     }
                 }
                 return true;

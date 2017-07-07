@@ -27,18 +27,24 @@ namespace BetBot
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static IWebDriver midas = new FirefoxDriver();
+        public static IWebDriver midas  = new FirefoxDriver();
         //public static EventFiringWebDriver firingMidas = new EventFiringWebDriver(midas);
         Dictionary<string, string> dict = new Dictionary<string, string>();
         Navigation nav = new Navigation();
         private readonly IEnumerable<string[]> dictionary;
         BetBurger burger = new BetBurger();
         ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
+
+        divNav leftNav = new divNav();
         //placedBets functionality
 
         public MainWindow()
         {
+            //FirefoxProfile p = new FirefoxProfile();
+            //p.SetPreference("javascript.enabled", false);
+           
             InitializeComponent();
+            this.DataContext = this;
             //driver.Manage().Window.Maximize();
             midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
             midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
@@ -50,7 +56,7 @@ namespace BetBot
                 dict.Add(e[0].ToString(), e[1].ToString());
             }
 
-            BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
+            //BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
             // betList.Add(new BetList());
             //BetBurger.burgerMidas.ScriptExecuted += new EventHandler<WebDriverScriptEventArgs>(firingDriver_ScriptExecuted);
             //BetBurger.burgerMidas.ElementClicked += new EventHandler<WebElementEventArgs>(firingDriver_ButtonClicked);
@@ -60,7 +66,7 @@ namespace BetBot
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                MessageBox.Show("Added value");
+                //MessageBox.Show("Added value");
             }
         }
 
@@ -68,21 +74,20 @@ namespace BetBot
         {
 
             burger.ScrapBurger();
-            divNav leftNav = new divNav();
-            betList = burger.GetArbsToJson();
+           // betList = burger.GetArbsToJson();
 
             foreach (var bet in betList)
             {
                 // navigate to betcategories
-                clickResponse(bet.sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
+                //clickResponse(bet.sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
                 // close all divs inside a category 
-                nav.closeAllOpenDivs();
+                //nav.closeAllOpenDivs();
                 // Find Country
-                clickResponse("Ην. Βασίλειο", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
+                //clickResponse("Ην. Βασίλειο", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
                 // Find Division 
-                clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
+                //clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
                 // Select Match
-                clickResponse(bet.eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
+               // clickResponse(bet.eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
 
             }
         }
@@ -91,25 +96,36 @@ namespace BetBot
         {
             if (!leftNav.fetchLeftNav(clickName, path))
             {
-                //errorLabel.Content = clickName + " Not Found!";
+                errorLabel.Content = clickName + " Not Found!";
             }
             else
             {
-                // errorLabel.Content = clickName;
+                errorLabel.Content = clickName;
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void BurgerClick(object sender, RoutedEventArgs e)
         {
             betList = burger.GetArbsToJson();
-            BetBurger.betList.Clear();
-            betList.Add(new BetList());
+            //BetBurger.betList.Clear();
+            for (int index = 0; index < betList.Count; index++)
+            {
+                clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
+                nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
+                clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
+                clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
+                clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
+                
+                                                        // html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div[4]/div[2]/div
+                //nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                //clickResponse("Goals Over/Under", "html /body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+
+            }
+            listViewBetList.ItemsSource = betList;
+            //BetBurger.betList.Clear();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            burger.DummyClick();
-        }
+       
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
