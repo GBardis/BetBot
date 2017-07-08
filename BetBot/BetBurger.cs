@@ -93,15 +93,14 @@ namespace BetBot
                         simpleBet.arbId = response.arb.id.ToString();
                         simpleBet.league = divisionsList[jj];
                         words.Add(divisionsList[jj].Split('.'));
-                        if (words.First().ElementAt(1) == words.First().ElementAt(2))
-                        {
-                            simpleBet.parentDiv = words.First().ElementAt(0);
+                        simpleBet.parentDiv = words.First().ElementAt(0);
+                        if (words.First().ElementAt(1) == words.First().ElementAt(0))
+                        {                            
                             simpleBet.childDiv = words.First().ElementAt(2);
                             jj++;
                         }
                         else
-                        {
-                            simpleBet.parentDiv = words.First().ElementAt(0);
+                        {                          
                             simpleBet.childDiv = words.First().ElementAt(1).Substring(1, words.First().ElementAt(1).Length - 1);
                             jj++;
                         }

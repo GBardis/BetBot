@@ -106,6 +106,7 @@ namespace BetBot
 
         private void BurgerClick(object sender, RoutedEventArgs e)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             betList = burger.GetArbsToJson();
             //BetBurger.betList.Clear();
             for (int index = 0; index < betList.Count; index++)
@@ -123,6 +124,9 @@ namespace BetBot
             }
             listViewBetList.ItemsSource = betList;
             //BetBurger.betList.Clear();
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            MessageBox.Show(elapsedMs.ToString());
         }
 
        
