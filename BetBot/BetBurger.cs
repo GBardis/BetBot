@@ -74,7 +74,7 @@ namespace BetBot
 
             divisionsList.Clear();
             divisionsList = FindBetDivision();
-            string[] words = new string[2];
+            List<string[]> words = new List<string[]>();
             int jj = 0;
             foreach (IWebElement jsonArb in jsonArbs)
             {
@@ -83,7 +83,7 @@ namespace BetBot
                 url = url.Substring(url.IndexOf('#') + 1);
                 j = JToken.Parse(url);
                 response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
-
+                words.Clear();
                 for (int i = 0; i < response.bets.Count; i++)
                 {
                     if (response.bets[i].bookmaker_id == "10")
@@ -92,10 +92,19 @@ namespace BetBot
                         //fileWriteResponses.Add(response.bets[i].home.ToString());
                         simpleBet.arbId = response.arb.id.ToString();
                         simpleBet.league = divisionsList[jj];
-                        words = divisionsList[jj].Split('.');
-                        simpleBet.parentDiv = words[0];
-                        if (words.Length > 1) simpleBet.childDiv = words[1].Substring(1, (words[1].Length - 1));
-                        jj++;
+                        words.Add(divisionsList[jj].Split('.'));
+                        if (words.First().ElementAt(1) == words.First().ElementAt(2))
+                        {
+                            simpleBet.parentDiv = words.First().ElementAt(0);
+                            simpleBet.childDiv = words.First().ElementAt(2);
+                            jj++;
+                        }
+                        else
+                        {
+                            simpleBet.parentDiv = words.First().ElementAt(0);
+                            simpleBet.childDiv = words.First().ElementAt(1).Substring(1, words.First().ElementAt(1).Length - 1);
+                            jj++;
+                        }
                         simpleBet.sportId = response.arb.sport_id.ToString();
                         simpleBet.sportName = response.arb.sport.name.ToString();
                         simpleBet.betId = response.bets[i].id.ToString();
