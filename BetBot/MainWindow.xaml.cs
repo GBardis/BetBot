@@ -19,6 +19,7 @@ using System.IO;
 using OpenQA.Selenium.Support.Events;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace BetBot
 {
@@ -27,7 +28,7 @@ namespace BetBot
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static IWebDriver midas  = new FirefoxDriver();
+        public static IWebDriver midas = new FirefoxDriver();
         //public static EventFiringWebDriver firingMidas = new EventFiringWebDriver(midas);
         Dictionary<string, string> dict = new Dictionary<string, string>();
         Navigation nav = new Navigation();
@@ -36,13 +37,15 @@ namespace BetBot
         ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
 
         divNav leftNav = new divNav();
+        private Stopwatch watch;
+
         //placedBets functionality
 
         public MainWindow()
         {
             //FirefoxProfile p = new FirefoxProfile();
             //p.SetPreference("javascript.enabled", false);
-           
+
             InitializeComponent();
             this.DataContext = this;
             //driver.Manage().Window.Maximize();
@@ -74,7 +77,7 @@ namespace BetBot
         {
 
             burger.ScrapBurger();
-           // betList = burger.GetArbsToJson();
+            // betList = burger.GetArbsToJson();
 
             foreach (var bet in betList)
             {
@@ -87,7 +90,7 @@ namespace BetBot
                 // Find Division 
                 //clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
                 // Select Match
-               // clickResponse(bet.eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
+                // clickResponse(bet.eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
 
             }
         }
@@ -106,7 +109,7 @@ namespace BetBot
 
         private void BurgerClick(object sender, RoutedEventArgs e)
         {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+            watch = Stopwatch.StartNew();
             betList = burger.GetArbsToJson();
             //BetBurger.betList.Clear();
             for (int index = 0; index < betList.Count; index++)
@@ -116,8 +119,8 @@ namespace BetBot
                 clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
                 clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
                 clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
-                
-                                                        // html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div[4]/div[2]/div
+
+                // html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div[4]/div[2]/div
                 //nav.closeAllOpenDivs(".gl-MarketGroup_Open");
                 //clickResponse("Goals Over/Under", "html /body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
 
@@ -125,11 +128,11 @@ namespace BetBot
             listViewBetList.ItemsSource = betList;
             //BetBurger.betList.Clear();
             watch.Stop();
-            var elapsedMs = watch.ElapsedMilliseconds;
-            MessageBox.Show(elapsedMs.ToString());
+            long elapsedMs = watch.ElapsedMilliseconds;
+            performace.Content = ($"{elapsedMs.ToString()} ms");
         }
 
-       
+
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
