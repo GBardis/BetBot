@@ -5,24 +5,31 @@
         Title="MainWindow" Height="447" Width="1195">
     <Grid>
         <Button Content="Navigate" HorizontalAlignment="Left" Margin="48,75,0,0" VerticalAlignment="Top" Width="75" Click="Navigate_Click"/>
-        <Label x:Name="errorLabel" Content="No Errors!" HorizontalAlignment="Left" Margin="48,10,0,0" VerticalAlignment="Top" Width="430"/>
+        
         <Button Content="Fetch Burger" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
+        <Label x:Name="errorLabel" HorizontalAlignment="Left" Margin="548,8,0,0" VerticalAlignment="Top" Width="436">
+            <Label Content="Find Element"/>
+        </Label>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
         <ListView x:Name="listViewBetList" HorizontalAlignment="Left" Height="290" Margin="178,49,0,0" VerticalAlignment="Top" Width="952" ItemsSource="{Binding betList}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="140" Header="Event Name" DisplayMemberBinding="{Binding eventName}"/>                    
+                    <GridViewColumn Width="140" Header="Event Name" DisplayMemberBinding="{Binding eventName}"/>
                     <GridViewColumn Width="140" Header="Division1" DisplayMemberBinding="{Binding childDiv}"  />
                     <GridViewColumn Width="140" Header="Division2" DisplayMemberBinding="{Binding parentDiv}"  />
                     <GridViewColumn Width="140" Header="home" DisplayMemberBinding="{Binding home}"  />
                     <GridViewColumn Width="140" Header="away" DisplayMemberBinding="{Binding away}"  />
                     <GridViewColumn Width="140" Header="Coef" DisplayMemberBinding="{Binding koef}"  />
-                    <GridViewColumn Width="140" Header="Type" DisplayMemberBinding="{Binding betType}"  />                    
+                    <GridViewColumn Width="140" Header="Type" DisplayMemberBinding="{Binding betType}"  />
                 </GridView>
             </ListView.View>
             <ListView.DataContext>
                 <local:BetList/>
             </ListView.DataContext>
         </ListView>
+        <Label x:Name="performace" HorizontalAlignment="Left" Margin="61,8,0,0" VerticalAlignment="Top" Width="430">
+            <Label Content="Performace"/>
+        </Label>
         <Button Content="Clear List!" HorizontalAlignment="Left" Margin="48,167,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
     </Grid>
 </Window>

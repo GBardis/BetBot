@@ -19,6 +19,7 @@ using System.IO;
 using OpenQA.Selenium.Support.Events;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Windows.Threading;
 
 namespace BetBot
@@ -38,6 +39,8 @@ namespace BetBot
         ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
         divNav leftNav = new divNav();
+        private Stopwatch watch;
+
         int ITERATIONS = 0;
         //placedBets functionality
 
@@ -45,7 +48,7 @@ namespace BetBot
         {
             //FirefoxProfile p = new FirefoxProfile();
             //p.SetPreference("javascript.enabled", false);
-           
+
             InitializeComponent();
             
             dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
@@ -118,9 +121,22 @@ namespace BetBot
                 errorLabel.Content = clickName;
             }
         }
+        private void Koef(string koef, string path, divNav leftNav)
+        {
+            if (!leftNav.KoefToDouble(koef, path))
+            {
+                errorLabel.Content = koef + " Not Found!";
+            }
+            else
+            {
+                errorLabel.Content = koef;
+            }
+
+        }
 
         private void BurgerClick(object sender, RoutedEventArgs e)
         {
+            watch = Stopwatch.StartNew();
             dispatcherTimer.Start();
             //   THIS CODE RUNS IN THE dispatcherTimer_Tick METHOD!
             //betList = burger.GetArbsToJson();
@@ -137,10 +153,10 @@ namespace BetBot
             //    }         
             //}
             //listViewBetList.ItemsSource = betList;
+            watch.Stop();
+            long elapsedMs = watch.ElapsedMilliseconds;
+            performace.Content = ($"{elapsedMs.ToString()} ms");
         }
-
-       
-
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 
