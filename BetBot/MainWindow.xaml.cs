@@ -20,6 +20,7 @@ using OpenQA.Selenium.Support.Events;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using OpenQA.Selenium.Support.UI;
 
 namespace BetBot
 {
@@ -48,11 +49,16 @@ namespace BetBot
 
             InitializeComponent();
             this.DataContext = this;
-            //driver.Manage().Window.Maximize();
+
             midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
             midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
             IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
             element.Click();
+            System.Threading.Thread.Sleep(1000);
+            IWebElement Odds = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/a"));
+            Odds.Click();
+            IWebElement hiddenList = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/div/div/a[2]"));
+            hiddenList.Click();
             dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
             foreach (string[] e in dictionary)
             {
@@ -131,8 +137,6 @@ namespace BetBot
                 clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
                 clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
                 clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
-
-                // html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div[4]/div[2]/div
                 nav.closeAllOpenDivs(".gl-MarketGroup_Open");
                 clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
                 Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);

@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
-using Json;
 using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Support.Events;
-using System.IO;
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Text.RegularExpressions;
+
 
 namespace BetBot
 {
