@@ -82,47 +82,54 @@ namespace BetBot
 
             foreach (IWebElement jsonArb in jsonArbs)
             {
-                url = jsonArb.GetAttribute("href");
-                url = Uri.UnescapeDataString(url);
-                url = url.Substring(url.IndexOf('#') + 1);
-                j = JToken.Parse(url);
-                response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
-
-                for (int i = 0; i < response.bets.Count; i++)
+                try
                 {
-                    if (response.bets[i].bookmaker_id == "10")
+                    url = jsonArb.GetAttribute("href");
+                    url = Uri.UnescapeDataString(url);
+                    url = url.Substring(url.IndexOf('#') + 1);
+                    j = JToken.Parse(url);
+                    response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
+
+                    for (int i = 0; i < response.bets.Count; i++)
                     {
-
-                        responses.Add(response.bets[i]);
-                        //fileWriteResponses.Add(response.bets[i].home.ToString());
-                        simpleBet.arbId = response.arb.id.ToString();
-                        simpleBet.league = divisionsList[jj];
-                        words = divisionsList[jj].Split('.');
-                        simpleBet.parentDiv = words[0];
-                        if (words.Length > 1) simpleBet.childDiv = words[1].Substring(1, (words[1].Length - 1));
-                        jj++;
-                        simpleBet.sportId = response.arb.sport_id.ToString();
-                        simpleBet.sportName = response.arb.sport.name.ToString();
-                        simpleBet.betId = response.bets[i].id.ToString();
-                        simpleBet.koef = response.bets[i].koef.ToString();
-                        simpleBet.home = response.bets[i].home.ToString();
-                        simpleBet.away = response.bets[i].away.ToString();
-                        simpleBet.eventName = simpleBet.home + " v " + simpleBet.away;
-                        simpleBet.betType = response.bets[i].bet_combination.title.ToString();
-                        simpleBet.bookmakerId = response.bets[i].bookmaker_id;
-                        simpleBet.countryId = response.arb.country_id;
-                        simpleBet.eqFlag = false;
-                        simpleBet.thrown = false;
-
-                        if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown)))
+                        if (response.bets[i].bookmaker_id == "10")
                         {
 
-                        }
-                        else
-                        {
-                            betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown));
+                            responses.Add(response.bets[i]);
+                            //fileWriteResponses.Add(response.bets[i].home.ToString());
+                            simpleBet.arbId = response.arb.id.ToString();
+                            simpleBet.league = divisionsList[jj];
+                            words = divisionsList[jj].Split('.');
+                            simpleBet.parentDiv = words[0];
+                            if (words.Length > 1) simpleBet.childDiv = words[1].Substring(1, (words[1].Length - 1));
+                            jj++;
+                            simpleBet.sportId = response.arb.sport_id.ToString();
+                            simpleBet.sportName = response.arb.sport.name.ToString();
+                            simpleBet.betId = response.bets[i].id.ToString();
+                            simpleBet.koef = response.bets[i].koef.ToString();
+                            simpleBet.home = response.bets[i].home.ToString();
+                            simpleBet.away = response.bets[i].away.ToString();
+                            simpleBet.eventName = simpleBet.home + " v " + simpleBet.away;
+                            simpleBet.betType = response.bets[i].bet_combination.title.ToString();
+                            simpleBet.bookmakerId = response.bets[i].bookmaker_id;
+                            simpleBet.countryId = response.arb.country_id;
+                            simpleBet.eqFlag = false;
+                            simpleBet.thrown = false;
+
+                            if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown)))
+                            {
+
+                            }
+                            else
+                            {
+                                betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown));
+                            }
                         }
                     }
+                }
+                catch(Exception ex)
+                {
+
                 }
             }
 
@@ -148,7 +155,7 @@ namespace BetBot
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("ERROR");
+                   // MessageBox.Show("ERROR");
                 }
             }
             return betCompanyDivisions;
