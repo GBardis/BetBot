@@ -8,9 +8,9 @@
         
         <Button Content="Fetch Burger" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
         <Label x:Name="errorLabel" HorizontalAlignment="Left" Margin="548,8,0,0" VerticalAlignment="Top" Width="436">
-            <Label Content="Find Element"/>
+            <Label Content="Iterations"/>
         </Label>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
+        <Button Content="Fetch Burger" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
         <ListView x:Name="listViewBetList" HorizontalAlignment="Left" Height="290" Margin="178,49,0,0" VerticalAlignment="Top" Width="952" ItemsSource="{Binding betList}">
             <ListView.View>
                 <GridView>
