@@ -15,6 +15,8 @@ using System.Windows;
 using System.Windows.Controls;
 
 
+
+
 namespace BetBot
 {
     class BetBurger
@@ -24,8 +26,8 @@ namespace BetBot
         List<dynamic> responses = new List<dynamic>();
         //List<string> fileWriteResponses = new List<string>();
         List<IWebElement> jsonArbs = new List<IWebElement>();
-        List<IWebElement> jsonArbsTemp = new List<IWebElement>();
         public static ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
+        public static ObservableCollection<BetList> tempBetList = new ObservableCollection<BetList>();
         BetList simpleBet = new BetList();
         JToken j;
         string url;
@@ -37,6 +39,7 @@ namespace BetBot
         List<int> betCompanyIndexes = new List<int>();
         List<string> betCompanyDivisions = new List<string>();
         List<string> divisionsList = new List<string>();
+        bool eqFlag = false;
 
         public void ScrapBurger()
         {
@@ -68,7 +71,7 @@ namespace BetBot
 
         public ObservableCollection<BetList> GetArbsToJson()
         {
-            betList.Clear();
+            //betList.Clear();
             responses.Clear();
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
 
@@ -76,6 +79,7 @@ namespace BetBot
             divisionsList = FindBetDivision();
             string[] words = new string[2];
             int jj = 0;
+
             foreach (IWebElement jsonArb in jsonArbs)
             {
                 url = jsonArb.GetAttribute("href");
@@ -88,6 +92,7 @@ namespace BetBot
                 {
                     if (response.bets[i].bookmaker_id == "10")
                     {
+
                         responses.Add(response.bets[i]);
                         //fileWriteResponses.Add(response.bets[i].home.ToString());
                         simpleBet.arbId = response.arb.id.ToString();
@@ -106,12 +111,21 @@ namespace BetBot
                         simpleBet.betType = response.bets[i].bet_combination.title.ToString();
                         simpleBet.bookmakerId = response.bets[i].bookmaker_id;
                         simpleBet.countryId = response.arb.country_id;
-                        betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType));
+                        simpleBet.eqFlag = false;
+                        simpleBet.thrown = false;
 
+                        if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown)))
+                        {
+
+                        }
+                        else
+                        {
+                            betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown));
+                        }
                     }
                 }
             }
-            jsonArbsTemp = jsonArbs;
+
             //File.WriteAllLines("fuck.txt",betList);
             return betList;
         }
@@ -123,16 +137,18 @@ namespace BetBot
 
             for (int i = 0; i < betCompanies.Count; i++)
             {
-                if (betCompanies[i].Text == "Bet365")
+                try
                 {
-                    try
+                    if (betCompanies[i].Text == "Bet365")
                     {
+
                         betCompanyDivisions.Add(divisions[i].Text);
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("ERROR");
-                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("ERROR");
                 }
             }
             return betCompanyDivisions;
