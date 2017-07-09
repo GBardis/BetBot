@@ -92,8 +92,8 @@ namespace BetBot
                         responses.Add(response.bets[i]);
                         //fileWriteResponses.Add(response.bets[i].home.ToString());
                         simpleBet.arbId = response.arb.id.ToString();
-                        simpleBet.league = "Sweden.Sweden 1.div Norra";               
-                        //words.Add(divisionsList[jj].Split('.'));
+                        // simpleBet.league = "Sweden.Sweden 1.div Norra";
+                        simpleBet.league = divisionsList[jj];
                         words.Add(divisionsList[jj].Split('.'));
 
                         if (words.First().ElementAt(0) == "Sweden")
@@ -154,7 +154,7 @@ namespace BetBot
                     {
                         betCompanyDivisions.Add(divisions[i].Text);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         MessageBox.Show("ERROR");
                     }

@@ -44,19 +44,44 @@ namespace BetBot
             {
                 return false;
             }
+        }
+        public bool KoefToDouble(string koef, string path)
+        {
+            double koefDouble = Math.Round(Convert.ToDouble(koef), 2);
+            elements = MainWindow.midas.FindElements(By.XPath(path)).ToList<IWebElement>();
 
-            string MinifyElement(string element)
+            if (elements.Count > 0)
             {
-                StringBuilder b = new StringBuilder(element);
-                element.Replace(" ", string.Empty);
-                element.Replace("{", string.Empty);
-                element.Replace(":", string.Empty);
-                element.Replace("-", string.Empty);
-                element.Replace(",", string.Empty);
-                element.Replace(";", string.Empty);
-                element.Replace("&", string.Empty);
-                return b.ToString();
+                foreach (IWebElement element in elements)
+                {
+                    double elementDouble = Math.Round(Convert.ToDouble(element.Text),2);
+                    if (koefDouble == elementDouble)
+                    {
+                        element.Click();
+                        break;
+                    }
+                }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
+        public string MinifyElement(string element)
+        {
+            StringBuilder b = new StringBuilder(element);
+            b.Replace(" ", string.Empty);
+            b.Replace("{", string.Empty);
+            b.Replace(":", string.Empty);
+            b.Replace("-", string.Empty);
+            b.Replace(",", string.Empty);
+            b.Replace(";", string.Empty);
+            b.Replace("&", string.Empty);
+            b.Replace("/", string.Empty);
+            b.Replace(".", string.Empty);
+            return b.ToString();
+        }
+
     }
 }

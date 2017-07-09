@@ -106,6 +106,18 @@ namespace BetBot
                 errorLabel.Content = clickName;
             }
         }
+        private void Koef(string koef, string path, divNav leftNav)
+        {
+            if (!leftNav.KoefToDouble(koef, path))
+            {
+                errorLabel.Content = koef + " Not Found!";
+            }
+            else
+            {
+                errorLabel.Content = koef;
+            }
+
+        }
 
         private void BurgerClick(object sender, RoutedEventArgs e)
         {
@@ -121,8 +133,10 @@ namespace BetBot
                 clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
 
                 // html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div[4]/div[2]/div
-                //nav.closeAllOpenDivs(".gl-MarketGroup_Open");
-                //clickResponse("Goals Over/Under", "html /body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
+
 
             }
             listViewBetList.ItemsSource = betList;
@@ -131,9 +145,6 @@ namespace BetBot
             long elapsedMs = watch.ElapsedMilliseconds;
             performace.Content = ($"{elapsedMs.ToString()} ms");
         }
-
-
-
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 
