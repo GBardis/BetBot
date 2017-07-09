@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
-
+using System.Text.RegularExpressions;
 
 namespace BetBot
 {
@@ -15,7 +15,7 @@ namespace BetBot
         List<IWebElement> elements = new List<IWebElement>();
         WebDriverWait wait = new WebDriverWait(MainWindow.midas, TimeSpan.FromSeconds(10));
 
-        public bool fetchLeftNav(string clickName,string path)
+        public bool fetchLeftNav(string clickName, string path)
         {
             //elements = MainWindow.driver.FindElements(By.XPath(""));
             //string path = "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div";
@@ -27,12 +27,13 @@ namespace BetBot
                 {
                     try
                     {
-                        if (element.Text.ToLower().Replace(" ", "").Replace("-","").Replace("&", "") == clickName.ToLower().Replace(" ", "").Replace("-", "").Replace("&", ""))
+                        if (MinifyElement(element.Text.ToLower()) == MinifyElement(clickName.ToLower()))
                         {
                             element.Click();
                             break;
                         }
-                    }catch (Exception ex)
+                    }
+                    catch (Exception)
                     {
 
                     }
@@ -42,6 +43,19 @@ namespace BetBot
             else
             {
                 return false;
+            }
+
+            string MinifyElement(string element)
+            {
+                StringBuilder b = new StringBuilder(element);
+                element.Replace(" ", string.Empty);
+                element.Replace("{", string.Empty);
+                element.Replace(":", string.Empty);
+                element.Replace("-", string.Empty);
+                element.Replace(",", string.Empty);
+                element.Replace(";", string.Empty);
+                element.Replace("&", string.Empty);
+                return b.ToString();
             }
         }
     }

@@ -13,7 +13,7 @@ using System.IO;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-
+using System.Text.RegularExpressions;
 
 namespace BetBot
 {
@@ -74,7 +74,7 @@ namespace BetBot
 
             divisionsList.Clear();
             divisionsList = FindBetDivision();
-            string[] words = new string[2];
+            List<string[]> words = new List<string[]>();
             int jj = 0;
             foreach (IWebElement jsonArb in jsonArbs)
             {
@@ -84,6 +84,7 @@ namespace BetBot
                 j = JToken.Parse(url);
                 response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
 
+                words.Clear();
                 for (int i = 0; i < response.bets.Count; i++)
                 {
                     if (response.bets[i].bookmaker_id == "10")
@@ -91,13 +92,37 @@ namespace BetBot
                         responses.Add(response.bets[i]);
                         //fileWriteResponses.Add(response.bets[i].home.ToString());
                         simpleBet.arbId = response.arb.id.ToString();
-                        simpleBet.league = divisionsList[jj];
-                        words = divisionsList[jj].Split('.');
-                        simpleBet.parentDiv = words[0];
-                        if (words.Length > 1) simpleBet.childDiv = words[1].Substring(1, (words[1].Length - 1));
-                        jj++;
+                        simpleBet.league = "Sweden.Sweden 1.div Norra";               
+                        //words.Add(divisionsList[jj].Split('.'));
+                        words.Add(divisionsList[jj].Split('.'));
+
+                        if (words.First().ElementAt(0) == "Sweden")
+                        {
+                            words.Clear();
+                            string str = divisionsList[jj];
+                            words.Add(str.Split(new[] { "." }, 2, StringSplitOptions.None));
+
+                        }
+                        else
+                        {
+                            words.Add(divisionsList[jj].Split('.'));
+                        }
+
+
+                        simpleBet.parentDiv = words.First().ElementAt(0);
+                        if ((words.First().ElementAt(1) == words.First().ElementAt(0)))
+                        {
+                            simpleBet.childDiv = words.First().ElementAt(2);
+                            jj++;
+                        }
+                        else
+                        {
+                            simpleBet.childDiv = words.First().ElementAt(1).Substring(1, words.First().ElementAt(1).Length - 1);
+                            jj++;
+                        }
                         simpleBet.sportId = response.arb.sport_id.ToString();
                         simpleBet.sportName = response.arb.sport.name.ToString();
+                        simpleBet.countryId = response.arb.country_id;
                         simpleBet.betId = response.bets[i].id.ToString();
                         simpleBet.koef = response.bets[i].koef.ToString();
                         simpleBet.home = response.bets[i].home.ToString();
@@ -105,7 +130,7 @@ namespace BetBot
                         simpleBet.eventName = simpleBet.home + " v " + simpleBet.away;
                         simpleBet.betType = response.bets[i].bet_combination.title.ToString();
                         simpleBet.bookmakerId = response.bets[i].bookmaker_id;
-                        simpleBet.countryId = response.arb.country_id;
+
                         betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType));
 
                     }
