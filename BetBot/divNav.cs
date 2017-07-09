@@ -45,16 +45,16 @@ namespace BetBot
                 return false;
             }
 
-            string MinifyElement(string elemenet)
+            string MinifyElement(string element)
             {
-                StringBuilder b = new StringBuilder(elemenet);
-                elemenet.Replace(" ", string.Empty);
-                elemenet.Replace("{", string.Empty);
-                elemenet.Replace(":", string.Empty);
-                elemenet.Replace("-", string.Empty);
-                elemenet.Replace(",", string.Empty);
-                elemenet.Replace(";", string.Empty);
-                elemenet.Replace("&", string.Empty);
+                StringBuilder b = new StringBuilder(element);
+                element.Replace(" ", string.Empty);
+                element.Replace("{", string.Empty);
+                element.Replace(":", string.Empty);
+                element.Replace("-", string.Empty);
+                element.Replace(",", string.Empty);
+                element.Replace(";", string.Empty);
+                element.Replace("&", string.Empty);
                 return b.ToString();
             }
         }
