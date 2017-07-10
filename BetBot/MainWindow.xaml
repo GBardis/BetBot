@@ -4,16 +4,17 @@
         xmlns:local="clr-namespace:BetBot" x:Class="BetBot.MainWindow"
         Title="MainWindow" Height="447" Width="1195">
     <Grid>
-        <Button Content="Navigate" HorizontalAlignment="Left" Margin="48,75,0,0" VerticalAlignment="Top" Width="75" Click="Navigate_Click"/>
+        <Button x:Name="btnNavigate" Content="Navigate" HorizontalAlignment="Left" Margin="48,75,0,0" VerticalAlignment="Top" Width="75" Click="Navigate_Click"/>
         
         <Button Content="Fetch Burger" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
         <Label x:Name="errorLabel" HorizontalAlignment="Left" Margin="548,8,0,0" VerticalAlignment="Top" Width="436">
             <Label Content="Iterations"/>
         </Label>
-        <Button Content="Fetch Burger" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
+        <Button x:Name="btnFetchBurger" Content="Fetch Burger" HorizontalAlignment="Left" Margin="48,118,0,0" VerticalAlignment="Top" Width="75" Click="BurgerClick"/>
         <ListView x:Name="listViewBetList" HorizontalAlignment="Left" Height="290" Margin="178,49,0,0" VerticalAlignment="Top" Width="952" ItemsSource="{Binding betList}">
             <ListView.View>
                 <GridView>
+                    <GridViewColumn Width="140" Header="Thrown" DisplayMemberBinding="{Binding thrown}"/>
                     <GridViewColumn Width="140" Header="Event Name" DisplayMemberBinding="{Binding eventName}"/>
                     <GridViewColumn Width="140" Header="Division1" DisplayMemberBinding="{Binding childDiv}"  />
                     <GridViewColumn Width="140" Header="Division2" DisplayMemberBinding="{Binding parentDiv}"  />

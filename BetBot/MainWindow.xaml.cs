@@ -42,6 +42,8 @@ namespace BetBot
         private Stopwatch watch;
 
         int ITERATIONS = 0;
+        private object lockObject;
+
         //placedBets functionality
 
         public MainWindow()
@@ -50,6 +52,7 @@ namespace BetBot
             //p.SetPreference("javascript.enabled", false);
 
             InitializeComponent();
+           // BindingOperations.EnableCollectionSynchronization(betList,lockObject);
             
             dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
             dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -67,16 +70,28 @@ namespace BetBot
             }
 
             //BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
-            // betList.Add(new BetList());
-            //BetBurger.burgerMidas.ScriptExecuted += new EventHandler<WebDriverScriptEventArgs>(firingDriver_ScriptExecuted);
-            //BetBurger.burgerMidas.ElementClicked += new EventHandler<WebElementEventArgs>(firingDriver_ButtonClicked);
+           
         }
 
-        void dispatcherTimer_Tick(object sender,EventArgs e)
+        private async void  dispatcherTimer_Tick(object sender,EventArgs e)
         {
             dispatcherTimer.Stop();
-            betList = burger.GetArbsToJson();
-            //BetBurger.betList.Clear();
+            //threading
+            btnFetchBurger.IsEnabled = false;
+            betList = await Task.Factory.StartNew(() => burger.GetArbsToJson()).ConfigureAwait(true);
+            //await slowBurgerScrapper;
+            var slowBetClicker = Task.Factory.StartNew(() => SiteClicker()).ConfigureAwait(true);
+            await slowBetClicker;
+            listViewBetList.ItemsSource = null;
+            listViewBetList.ItemsSource = betList;
+            
+            ITERATIONS++;
+            errorLabel.Content = ITERATIONS.ToString();
+            dispatcherTimer.Start();
+        }
+
+        private void SiteClicker()
+        {
             for (int index = 0; index < betList.Count; index++)
             {
                 if (!betList[index].thrown)
@@ -87,13 +102,9 @@ namespace BetBot
                     clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
                     clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
                     betList[index].thrown = true;
-                }             
+                }
 
             }
-            listViewBetList.ItemsSource = betList;
-            ITERATIONS++;
-            errorLabel.Content = ITERATIONS.ToString();
-            dispatcherTimer.Start();
         }
 
         private void CollectionChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
@@ -104,21 +115,25 @@ namespace BetBot
             }
         }
 
-        private void Navigate_Click(object sender, RoutedEventArgs e)
+        private async void Navigate_Click(object sender, RoutedEventArgs e)
         {
-            burger.ScrapBurger();          
-            
+            btnNavigate.IsEnabled = false;
+            //threading
+            var slowNavigation = Task.Factory.StartNew(() => burger.ScrapBurger());
+            // burger.ScrapBurger();                      
+            await slowNavigation;
+            btnNavigate.IsEnabled = true;
         }
 
         private void clickResponse(string clickName, string path, divNav leftNav)
         {
             if (!leftNav.fetchLeftNav(clickName, path))
             {
-                errorLabel.Content = clickName + " Not Found!";
+                //errorLabel.Content = clickName + " Not Found!";
             }
             else
             {
-                errorLabel.Content = clickName;
+               // errorLabel.Content = clickName;
             }
         }
         private void Koef(string koef, string path, divNav leftNav)
@@ -134,7 +149,7 @@ namespace BetBot
 
         }
 
-        private void BurgerClick(object sender, RoutedEventArgs e)
+        private async void BurgerClick(object sender, RoutedEventArgs e)
         {
             watch = Stopwatch.StartNew();
             dispatcherTimer.Start();
