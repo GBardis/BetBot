@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BetBot
 {
-    class BetList
+    class BetList : IEquatable<BetList>
     {
         public string arbId { get ; set; }
         public string eventName { get; set; }
@@ -22,11 +22,12 @@ namespace BetBot
         public string away { get; set; }
         public string koef { get; set; }
         public string betType { get; set; }
+        public bool eqFlag { get; set; }
+        public bool thrown { get; set; }
 
-       
         public BetList() { }
 
-        public BetList(string carbId, string ceventName, string cleague, string ccountryId, string cbetId, string cbookmakerId, string cparentDiv, string cchildDiv, string csportId, string csportName, string chome, string caway, string ckoef, string cbetType)
+        public BetList(string carbId, string ceventName, string cleague, string ccountryId, string cbetId, string cbookmakerId, string cparentDiv, string cchildDiv, string csportId, string csportName, string chome, string caway, string ckoef, string cbetType, bool ceqFlag, bool cthrown)
         {
 
             arbId = carbId;
@@ -43,6 +44,20 @@ namespace BetBot
             away = caway;
             koef = ckoef;
             betType = cbetType;
+            eqFlag = ceqFlag;
+            thrown = cthrown;
+        }
+
+        public bool Equals(BetList other)
+        {
+            if (this.betId == other.betId)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

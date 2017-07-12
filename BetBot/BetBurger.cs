@@ -6,7 +6,7 @@ using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
-using System.Windows;
+
 
 
 namespace BetBot
@@ -18,8 +18,8 @@ namespace BetBot
         List<dynamic> responses = new List<dynamic>();
         //List<string> fileWriteResponses = new List<string>();
         List<IWebElement> jsonArbs = new List<IWebElement>();
-        List<IWebElement> jsonArbsTemp = new List<IWebElement>();
         public static ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
+        public static ObservableCollection<BetList> tempBetList = new ObservableCollection<BetList>();
         BetList simpleBet = new BetList();
         JToken j;
         string url;
@@ -31,6 +31,7 @@ namespace BetBot
         List<int> betCompanyIndexes = new List<int>();
         List<string> betCompanyDivisions = new List<string>();
         List<string> divisionsList = new List<string>();
+        bool eqFlag = false;
 
         public void ScrapBurger()
         {
@@ -62,7 +63,7 @@ namespace BetBot
 
         public ObservableCollection<BetList> GetArbsToJson()
         {
-            betList.Clear();
+            //betList.Clear();
             responses.Clear();
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
 
@@ -72,69 +73,78 @@ namespace BetBot
             int jj = 0;
             foreach (IWebElement jsonArb in jsonArbs)
             {
-                url = jsonArb.GetAttribute("href");
-                url = Uri.UnescapeDataString(url);
-                url = url.Substring(url.IndexOf('#') + 1);
-                j = JToken.Parse(url);
-                response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
-
-                words.Clear();
-                for (int i = 0; i < response.bets.Count; i++)
+                try
                 {
-                    if (response.bets[i].bookmaker_id == "10")
+                    url = jsonArb.GetAttribute("href");
+                    url = Uri.UnescapeDataString(url);
+                    url = url.Substring(url.IndexOf('#') + 1);
+                    j = JToken.Parse(url);
+                    response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
+
+                    words.Clear();
+                    for (int i = 0; i < response.bets.Count; i++)
                     {
-                        responses.Add(response.bets[i]);
-                        //fileWriteResponses.Add(response.bets[i].home.ToString());
-                        simpleBet.arbId = response.arb.id.ToString();
-                        // simpleBet.league = "Sweden.Sweden 1.div Norra";
-                        simpleBet.league = divisionsList[jj];
-                        words.Add(divisionsList[jj].Split('.'));
-
-                        if (words.First().ElementAt(0) == "Sweden")
+                        if (response.bets[i].bookmaker_id == "10")
                         {
-                            words.Clear();
-                            string str = divisionsList[jj];
-                            words.Add(str.Split(new[] { "." }, 2, StringSplitOptions.None));
-
-                        }
-                        else
-                        {
+                            responses.Add(response.bets[i]);                        
+                            simpleBet.arbId = response.arb.id.ToString();                          
+                            simpleBet.league = divisionsList[jj];
                             words.Add(divisionsList[jj].Split('.'));
+
+                            if (words.First().ElementAt(0) == "Sweden")
+                            {
+                                words.Clear();
+                                string str = divisionsList[jj];
+                                words.Add(str.Split(new[] { "." }, 2, StringSplitOptions.None));
+                            }
+                            else
+                            {
+                                words.Add(divisionsList[jj].Split('.'));
+                            }
+
+                            simpleBet.parentDiv = words.First().ElementAt(0);
+                            if ((words.First().ElementAt(1) == words.First().ElementAt(0)))
+                            {
+                                simpleBet.childDiv = words.First().ElementAt(2);
+                                jj++;
+                            }
+                            else
+                            {
+                                simpleBet.childDiv = words.First().ElementAt(1).Substring(1, words.First().ElementAt(1).Length - 1);
+                                jj++;
+                            }
+                            simpleBet.sportId = response.arb.sport_id.ToString();
+                            simpleBet.sportName = response.arb.sport.name.ToString();
+                            simpleBet.betId = response.bets[i].id.ToString();
+                            simpleBet.koef = response.bets[i].koef.ToString();
+                            simpleBet.home = response.bets[i].home.ToString();
+                            simpleBet.away = response.bets[i].away.ToString();
+                            simpleBet.eventName = simpleBet.home + " v " + simpleBet.away;
+                            simpleBet.betType = response.bets[i].bet_combination.title.ToString();
+                            simpleBet.bookmakerId = response.bets[i].bookmaker_id;
+                            simpleBet.countryId = response.arb.country_id;
+                            simpleBet.eqFlag = false;
+                            simpleBet.thrown = false;
+
+                            if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown)))
+                            {
+
+                            }
+                            else
+                            {
+                                betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown));
+                            }
                         }
-
-
-                        simpleBet.parentDiv = words.First().ElementAt(0);
-                        if ((words.First().ElementAt(1) == words.First().ElementAt(0)))
-                        {
-                            simpleBet.childDiv = words.First().ElementAt(2);
-                            jj++;
-                        }
-                        else
-                        {
-                            simpleBet.childDiv = words.First().ElementAt(1).Substring(1, words.First().ElementAt(1).Length - 1);
-                            jj++;
-                        }
-                        simpleBet.sportId = response.arb.sport_id.ToString();
-                        simpleBet.sportName = response.arb.sport.name.ToString();
-                        simpleBet.countryId = response.arb.country_id;
-                        simpleBet.betId = response.bets[i].id.ToString();
-                        simpleBet.koef = response.bets[i].koef.ToString();
-                        simpleBet.home = response.bets[i].home.ToString();
-                        simpleBet.away = response.bets[i].away.ToString();
-                        simpleBet.eventName = simpleBet.home + " v " + simpleBet.away;
-                        simpleBet.betType = response.bets[i].bet_combination.title.ToString();
-                        simpleBet.bookmakerId = response.bets[i].bookmaker_id;
-
-                        betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType));
-
                     }
                 }
+                catch (Exception)
+                {
+
+                }
             }
-            jsonArbsTemp = jsonArbs;
             //File.WriteAllLines("fuck.txt",betList);
             return betList;
         }
-
         public List<string> FindBetDivision()
         {
             betCompanies = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div/div/div[1]/div/div/div/div/div/a")).ToList<IWebElement>();
@@ -142,16 +152,18 @@ namespace BetBot
 
             for (int i = 0; i < betCompanies.Count; i++)
             {
-                if (betCompanies[i].Text == "Bet365")
+                try
                 {
-                    try
+                    if (betCompanies[i].Text == "Bet365")
                     {
+
                         betCompanyDivisions.Add(divisions[i].Text);
                     }
-                    catch (Exception)
-                    {
-                        MessageBox.Show("ERROR");
-                    }
+
+                }
+                catch (Exception)
+                {
+                    // MessageBox.Show("ERROR");
                 }
             }
             return betCompanyDivisions;

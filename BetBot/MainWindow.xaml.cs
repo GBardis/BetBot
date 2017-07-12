@@ -20,7 +20,8 @@ using OpenQA.Selenium.Support.Events;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using OpenQA.Selenium.Support.UI;
+using System.Windows.Threading;
+
 
 namespace BetBot
 {
@@ -29,6 +30,7 @@ namespace BetBot
     /// </summary>
     public partial class MainWindow : Window
     {
+
         public static IWebDriver midas = new FirefoxDriver();
         //public static EventFiringWebDriver firingMidas = new EventFiringWebDriver(midas);
         Dictionary<string, string> dict = new Dictionary<string, string>();
@@ -36,10 +38,11 @@ namespace BetBot
         private readonly IEnumerable<string[]> dictionary;
         BetBurger burger = new BetBurger();
         ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
-
+        DispatcherTimer dispatcherTimer = new DispatcherTimer();
         divNav leftNav = new divNav();
         private Stopwatch watch;
 
+        int ITERATIONS = 0;
         //placedBets functionality
 
         public MainWindow()
@@ -48,9 +51,13 @@ namespace BetBot
             //p.SetPreference("javascript.enabled", false);
 
             InitializeComponent();
-            this.DataContext = this;
 
-            midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
+            dispatcherTimer.Tick += dispatcherTimer_Tick;
+            //dispatcherTimer.Start();
+            this.DataContext = this;
+            //driver.Manage().Window.Maximize();
+            midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
             midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
             IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
             element.Click();
@@ -71,34 +78,48 @@ namespace BetBot
             //BetBurger.burgerMidas.ElementClicked += new EventHandler<WebElementEventArgs>(firingDriver_ButtonClicked);
         }
 
+        void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            dispatcherTimer.Stop();
+            watch = Stopwatch.StartNew();
+            betList = burger.GetArbsToJson();
+            //BetBurger.betList.Clear();
+            for (int index = 0; index < betList.Count; index++)
+            {
+                if (!betList[index].thrown)
+                {
+                    clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
+                    nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
+                    clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
+                    clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
+                    clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                    Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
+                    betList[index].thrown = true;
+                }
+            }
+            watch.Stop();
+            long elapsedMs = watch.ElapsedMilliseconds;
+            performace.Content = ($"{elapsedMs.ToString()} ms");
+            listViewBetList.ItemsSource = betList;
+            ITERATIONS++;
+            errorLabel.Content = ITERATIONS.ToString();
+            dispatcherTimer.Start();
+        }
+
         private void CollectionChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                //MessageBox.Show("Added value");
+                MessageBox.Show("Added value");
             }
         }
 
         private void Navigate_Click(object sender, RoutedEventArgs e)
         {
-
             burger.ScrapBurger();
-            // betList = burger.GetArbsToJson();
 
-            foreach (var bet in betList)
-            {
-                // navigate to betcategories
-                //clickResponse(bet.sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
-                // close all divs inside a category 
-                //nav.closeAllOpenDivs();
-                // Find Country
-                //clickResponse("Ην. Βασίλειο", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
-                // Find Division 
-                //clickResponse("Αγγλία - Πρέμιερ Λιγκ", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div[3]/div[2]/div", leftNav);
-                // Select Match
-                // clickResponse(bet.eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div[2]/div/div[1]/div/div/div", leftNav);
-
-            }
         }
 
         private void clickResponse(string clickName, string path, divNav leftNav)
@@ -127,31 +148,33 @@ namespace BetBot
 
         private void BurgerClick(object sender, RoutedEventArgs e)
         {
-            watch = Stopwatch.StartNew();
-            betList = burger.GetArbsToJson();
-            //BetBurger.betList.Clear();
-            for (int index = 0; index < betList.Count; index++)
-            {
-                clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
-                nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
-                clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
-                clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
-                clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
-                nav.closeAllOpenDivs(".gl-MarketGroup_Open");
-                clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
-                Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
+            dispatcherTimer.Start();
 
+            //   THIS CODE RUNS IN THE dispatcherTimer_Tick METHOD!
+            //betList = burger.GetArbsToJson();
+            //for (int index = 0; index < betList.Count; index++)
+            //{
+            //    if (!betList[index].thrown)
+            //    {
+            //        clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
+            //        nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
+            //        clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
+            //        clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
+            //        clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
+            //        betList[index].thrown = true;
+            //    }         
+            //}
+            //listViewBetList.ItemsSource = betList;
 
-            }
-            listViewBetList.ItemsSource = betList;
-            //BetBurger.betList.Clear();
-            watch.Stop();
-            long elapsedMs = watch.ElapsedMilliseconds;
-            performace.Content = ($"{elapsedMs.ToString()} ms");
         }
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
 
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            BetBurger.betList.Clear();
         }
     }
 }
