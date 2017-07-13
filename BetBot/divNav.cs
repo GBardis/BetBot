@@ -50,12 +50,20 @@ namespace BetBot
             {
                 foreach (IWebElement element in elements)
                 {
-                    double elementDouble = Math.Round(Convert.ToDouble(element.Text), 2);
-                    if (koefDouble == elementDouble)
+                    try
                     {
-                        element.Click();
-                        break;
+                        double elementDouble = Math.Round(Convert.ToDouble(element.Text), 2);
+                        if (koefDouble == elementDouble)
+                        {
+                            element.Click();
+                            break;
+                        }
                     }
+                    catch (Exception)
+                    {
+
+                    }
+
                 }
                 return true;
             }
