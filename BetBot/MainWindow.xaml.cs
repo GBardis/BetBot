@@ -22,6 +22,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Threading;
 
+
 namespace BetBot
 {
     /// <summary>
@@ -29,8 +30,8 @@ namespace BetBot
     /// </summary>
     public partial class MainWindow : Window
     {
-        
-        public static IWebDriver midas  = new FirefoxDriver();
+
+        public static IWebDriver midas = new FirefoxDriver();
         //public static EventFiringWebDriver firingMidas = new EventFiringWebDriver(midas);
         Dictionary<string, string> dict = new Dictionary<string, string>();
         Navigation nav = new Navigation();
@@ -50,10 +51,8 @@ namespace BetBot
         {
             //FirefoxProfile p = new FirefoxProfile();
             //p.SetPreference("javascript.enabled", false);
-
             InitializeComponent();
-           // BindingOperations.EnableCollectionSynchronization(betList,lockObject);
-            
+            // BindingOperations.EnableCollectionSynchronization(betList,lockObject);           
             dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
             dispatcherTimer.Tick += dispatcherTimer_Tick;
             //dispatcherTimer.Start();
@@ -63,19 +62,23 @@ namespace BetBot
             midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
             IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
             element.Click();
+            System.Threading.Thread.Sleep(1000);
+            IWebElement Odds = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/a"));
+            Odds.Click();
+            IWebElement hiddenList = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/div/div/a[2]"));
+            hiddenList.Click();
             dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
             foreach (string[] e in dictionary)
             {
                 dict.Add(e[0].ToString(), e[1].ToString());
             }
-
             //BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
-           
         }
 
-        private async void  dispatcherTimer_Tick(object sender,EventArgs e)
+        private async void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             dispatcherTimer.Stop();
+            watch = Stopwatch.StartNew();
             //threading
             btnFetchBurger.IsEnabled = false;
             betList = await Task.Factory.StartNew(() => burger.GetArbsToJson()).ConfigureAwait(true);
@@ -84,7 +87,9 @@ namespace BetBot
             await slowBetClicker;
             listViewBetList.ItemsSource = null;
             listViewBetList.ItemsSource = betList;
-            
+            watch.Stop();
+            long elapsedMs = watch.ElapsedMilliseconds;
+            performace.Content = elapsedMs.ToString() + "ms";
             ITERATIONS++;
             errorLabel.Content = ITERATIONS.ToString();
             dispatcherTimer.Start();
@@ -101,9 +106,11 @@ namespace BetBot
                     clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
                     clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
                     clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                    Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
                     betList[index].thrown = true;
                 }
-
             }
         }
 
@@ -133,44 +140,25 @@ namespace BetBot
             }
             else
             {
-               // errorLabel.Content = clickName;
+                // errorLabel.Content = clickName;
             }
         }
+
         private void Koef(string koef, string path, divNav leftNav)
         {
             if (!leftNav.KoefToDouble(koef, path))
             {
-                errorLabel.Content = koef + " Not Found!";
+                // errorLabel.Content = koef + " Not Found!";
             }
             else
             {
-                errorLabel.Content = koef;
+                // errorLabel.Content = koef;
             }
-
         }
 
         private async void BurgerClick(object sender, RoutedEventArgs e)
         {
-            watch = Stopwatch.StartNew();
             dispatcherTimer.Start();
-            //   THIS CODE RUNS IN THE dispatcherTimer_Tick METHOD!
-            //betList = burger.GetArbsToJson();
-            //for (int index = 0; index < betList.Count; index++)
-            //{
-            //    if (!betList[index].thrown)
-            //    {
-            //        clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
-            //        nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
-            //        clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
-            //        clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
-            //        clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
-            //        betList[index].thrown = true;
-            //    }         
-            //}
-            //listViewBetList.ItemsSource = betList;
-            watch.Stop();
-            long elapsedMs = watch.ElapsedMilliseconds;
-            performace.Content = ($"{elapsedMs.ToString()} ms");
         }
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -183,6 +171,8 @@ namespace BetBot
         }
     }
 }
+
+
 
 
 

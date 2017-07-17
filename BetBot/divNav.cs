@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
-using System.Text.RegularExpressions;
 
 namespace BetBot
 {
     class divNav : Navigation
     {
         List<IWebElement> elements = new List<IWebElement>();
-        WebDriverWait wait = new WebDriverWait(MainWindow.midas, TimeSpan.FromSeconds(10));
 
         public bool fetchLeftNav(string clickName, string path)
         {
@@ -54,12 +50,20 @@ namespace BetBot
             {
                 foreach (IWebElement element in elements)
                 {
-                    double elementDouble = Math.Round(Convert.ToDouble(element.Text),2);
-                    if (koefDouble == elementDouble)
+                    try
                     {
-                        element.Click();
-                        break;
+                        double elementDouble = Math.Round(Convert.ToDouble(element.Text), 2);
+                        if (koefDouble == elementDouble)
+                        {
+                            element.Click();
+                            break;
+                        }
                     }
+                    catch (Exception)
+                    {
+
+                    }
+
                 }
                 return true;
             }
@@ -82,6 +86,5 @@ namespace BetBot
             b.Replace(".", string.Empty);
             return b.ToString();
         }
-
     }
 }

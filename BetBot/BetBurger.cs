@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
-using Json;
 using Newtonsoft.Json.Linq;
-using OpenQA.Selenium.Support.Events;
-using System.IO;
 using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-
 
 
 
@@ -74,12 +66,11 @@ namespace BetBot
             //betList.Clear();
             responses.Clear();
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
-
+            List<string[]> SplitedDivision = new List<string[]>();
             divisionsList.Clear();
             divisionsList = FindBetDivision();
-            string[] words = new string[2];
-            int jj = 0;
 
+            int jj = 0;
             foreach (IWebElement jsonArb in jsonArbs)
             {
                 try
@@ -90,19 +81,27 @@ namespace BetBot
                     j = JToken.Parse(url);
                     response = JsonConvert.DeserializeObject<dynamic>(j.ToString());
 
+
                     for (int i = 0; i < response.bets.Count; i++)
                     {
                         if (response.bets[i].bookmaker_id == "10")
                         {
-
                             responses.Add(response.bets[i]);
-                            //fileWriteResponses.Add(response.bets[i].home.ToString());
                             simpleBet.arbId = response.arb.id.ToString();
                             simpleBet.league = divisionsList[jj];
-                            words = divisionsList[jj].Split('.');
-                            simpleBet.parentDiv = words[0];
-                            if (words.Length > 1) simpleBet.childDiv = words[1].Substring(1, (words[1].Length - 1));
-                            jj++;
+                            SplitedDivision = SplitDivision(simpleBet.league);
+                            simpleBet.parentDiv = SplitedDivision.First().ElementAt(0);
+                            if ((SplitedDivision.First().ElementAt(1) == SplitedDivision.First().ElementAt(0)))
+                            {
+                                simpleBet.childDiv = SplitedDivision.First().ElementAt(2);
+                                jj++;
+                            }
+                            else
+                            {
+                                simpleBet.childDiv = SplitedDivision.First().ElementAt(1).Substring(1, SplitedDivision.First().ElementAt(1).Length - 1);
+                                jj++;
+                            }
+
                             simpleBet.sportId = response.arb.sport_id.ToString();
                             simpleBet.sportName = response.arb.sport.name.ToString();
                             simpleBet.betId = response.bets[i].id.ToString();
@@ -127,14 +126,31 @@ namespace BetBot
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception)
                 {
 
                 }
             }
-
             //File.WriteAllLines("fuck.txt",betList);
             return betList;
+        }
+
+        private List<string[]> SplitDivision(string divisions)
+        {
+            List<string[]> words = new List<string[]>();
+            words.Add(divisions.Split('.'));
+
+            if (words.First().ElementAt(0) == "Sweden" || words.First().ElementAt(0) == "Europe" || words.First().ElementAt(0) == "Germany")
+            {
+                words.Clear();
+                string str = divisions;
+                words.Add(str.Split(new[] { "." }, 2, StringSplitOptions.None));
+            }
+            else
+            {
+                words.Add(divisions.Split('.'));
+            }
+            return words;
         }
 
         public List<string> FindBetDivision()
@@ -153,9 +169,9 @@ namespace BetBot
                     }
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                   // MessageBox.Show("ERROR");
+                    // MessageBox.Show("ERROR");
                 }
             }
             return betCompanyDivisions;
