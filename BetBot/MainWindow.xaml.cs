@@ -109,6 +109,7 @@ namespace BetBot
                     nav.closeAllOpenDivs(".gl-MarketGroup_Open");
                     clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
                     Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
+                    placeMaxBet();
                     betList[index].thrown = true;
                 }
             }
@@ -154,6 +155,33 @@ namespace BetBot
             {
                 // errorLabel.Content = koef;
             }
+        }
+        private void placeMaxBet()
+        {
+            midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(300);
+            IWebElement iframe;
+            IWebElement element;
+            try
+            {
+                iframe = midas.FindElement(By.TagName("iframe"));
+                midas.SwitchTo();
+                element = midas.FindElement(By.XPath("html/body/div[1]/div/ul/li[3]/ul/li/div[3]/div[2]/span"));
+                if (element.Displayed)
+                {
+                    element.Click();
+                }              
+                element = midas.FindElement(By.XPath("html/body/div[1]/div/ul/li[8]/a[2]/div"));
+                if (element.Displayed)
+                {
+                    element.Click();
+                }
+                midas.SwitchTo().DefaultContent();
+            }
+            catch (Exception)
+            {
+
+            }
+
         }
 
         private async void BurgerClick(object sender, RoutedEventArgs e)
