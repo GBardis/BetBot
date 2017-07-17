@@ -89,8 +89,19 @@ namespace BetBot
                             responses.Add(response.bets[i]);
                             simpleBet.arbId = response.arb.id.ToString();
                             simpleBet.league = divisionsList[jj];
-                            SplitedDivision = SplitDivision(simpleBet.league, jj);
-                            jj++;
+                            SplitedDivision = SplitDivision(simpleBet.league);
+                            simpleBet.parentDiv = SplitedDivision.First().ElementAt(0);
+                            if ((SplitedDivision.First().ElementAt(1) == SplitedDivision.First().ElementAt(0)))
+                            {
+                                simpleBet.childDiv = SplitedDivision.First().ElementAt(2);
+                                jj++;
+                            }
+                            else
+                            {
+                                simpleBet.childDiv = SplitedDivision.First().ElementAt(1).Substring(1, SplitedDivision.First().ElementAt(1).Length - 1);
+                                jj++;
+                            }
+
                             simpleBet.sportId = response.arb.sport_id.ToString();
                             simpleBet.sportName = response.arb.sport.name.ToString();
                             simpleBet.betId = response.bets[i].id.ToString();
@@ -124,7 +135,7 @@ namespace BetBot
             return betList;
         }
 
-        private List<string[]> SplitDivision(string divisions, int jj)
+        private List<string[]> SplitDivision(string divisions)
         {
             List<string[]> words = new List<string[]>();
             words.Add(divisions.Split('.'));
@@ -139,19 +150,6 @@ namespace BetBot
             {
                 words.Add(divisions.Split('.'));
             }
-
-            simpleBet.parentDiv = words.First().ElementAt(0);
-            if ((words.First().ElementAt(1) == words.First().ElementAt(0)))
-            {
-                simpleBet.childDiv = words.First().ElementAt(2);
-
-            }
-            else
-            {
-                simpleBet.childDiv = words.First().ElementAt(1).Substring(1, words.First().ElementAt(1).Length - 1);
-
-            }
-
             return words;
         }
 
