@@ -72,6 +72,7 @@ namespace BetBot
                 return false;
             }
         }
+
         public string MinifyElement(string element)
         {
             StringBuilder b = new StringBuilder(element);

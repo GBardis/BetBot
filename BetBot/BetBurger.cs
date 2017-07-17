@@ -91,6 +91,7 @@ namespace BetBot
                             simpleBet.league = divisionsList[jj];
                             SplitedDivision = SplitDivision(simpleBet.league);
                             simpleBet.parentDiv = SplitedDivision.First().ElementAt(0);
+
                             if ((SplitedDivision.First().ElementAt(1) == SplitedDivision.First().ElementAt(0)))
                             {
                                 simpleBet.childDiv = SplitedDivision.First().ElementAt(2);
@@ -98,7 +99,7 @@ namespace BetBot
                             }
                             else
                             {
-                                simpleBet.childDiv = SplitedDivision.First().ElementAt(1).Substring(1, SplitedDivision.First().ElementAt(1).Length - 1);
+                                simpleBet.childDiv = SplitedDivision.First().ElementAt(1).Replace(" ",string.Empty);
                                 jj++;
                             }
 
@@ -145,10 +146,13 @@ namespace BetBot
                 words.Clear();
                 string str = divisions;
                 words.Add(str.Split(new[] { "." }, 2, StringSplitOptions.None));
+
+
             }
             else
             {
                 words.Add(divisions.Split('.'));
+             
             }
             return words;
         }
