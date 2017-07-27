@@ -16,12 +16,13 @@ using System.Windows.Shapes;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support;
 using System.IO;
+
 using OpenQA.Selenium.Support.Events;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Windows.Threading;
-
+using System.Reflection;
 
 namespace BetBot
 {
@@ -63,11 +64,12 @@ namespace BetBot
             //driver.Manage().Window.Maximize();
             midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
 
-            //dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
-            //foreach (string[] e in dictionary)
-            //{
-            //    dict.Add(e[0].ToString(), e[1].ToString());
-            //}
+            dictionary = File.ReadLines(@"logs/LOG.txt").Select(line => line.Split(','));
+            foreach (string[] e in dictionary)
+            {
+                BetBurger.historyList.Add(new BetList(e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12], e[13], Convert.ToBoolean(e[14]), Convert.ToBoolean(e[15]), Convert.ToBoolean(e[16]), Convert.ToInt32(e[17])));
+            }
+            
             //BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
         }
 
@@ -95,9 +97,10 @@ namespace BetBot
 
         private void SiteClicker()
         {
+            
             for (int index = 0; index < betList.Count; index++)
             {
-                if (!betList[index].thrown && !betList[index].coefChanged && betList[index].faultCounter <= 2)
+                if (!betList[index].thrown && !betList[index].coefChanged && betList[index].faultCounter <= 2 /*&& !BetBurger.historyList[index].thrown && !BetBurger.historyList[index].coefChanged && BetBurger.historyList[index].faultCounter <= 2*/)
                 {
                     clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
                     nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
@@ -128,8 +131,9 @@ namespace BetBot
                             betList[index].faultCounter++;
                         }
                     }
+                    CreateCSVFromGenericList(betList, "C:\\Users\\John\\Documents\\Visual Studio 2017\\Projects\\BetBot\\BetBot\\bin\\Debug\\logs\\LOG.txt", betList[index]);
                 }
-            }
+            }            
         }
 
         private bool BetMap(string betType, string koef)
@@ -186,7 +190,7 @@ namespace BetBot
             IWebElement UserNameText = midas.FindElement(By.CssSelector(".hm-Login_InputField"));
             IWebElement PasswordText = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[1]/div[2]/div/div[2]/input[1]"));
             UserNameText.SendKeys(userName365TextBox.Text);
-            PasswordText.Click();            
+            PasswordText.Click();
             IWebElement PasswordText2 = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[1]/div[2]/div/div[2]/input[2]"));
             PasswordText2.SendKeys(password365TextBox.Text);
             IWebElement element2 = midas.FindElement(By.CssSelector(".hm-Login_LoginBtn"));
@@ -312,7 +316,46 @@ namespace BetBot
         {
             BetBurger.betList.Clear();
         }
+
+        public static void CreateCSVFromGenericList<BetList>(ObservableCollection<BetList> list, string csvCompletePath,BetList item)
+        {
+            if (list == null || list.Count == 0) return;
+
+            //get type from 0th member
+            Type t = list[0].GetType();
+            string newLine = Environment.NewLine;
+
+            if (!Directory.Exists(System.IO.Path.GetDirectoryName(csvCompletePath))) Directory.CreateDirectory(System.IO.Path.GetDirectoryName(csvCompletePath));
+
+           // if (!File.Exists(csvCompletePath)) File.Create(csvCompletePath);
+
+            using (var sw = new StreamWriter(csvCompletePath,true))
+            {
+                //make a new instance of the class name we figured out to get its props
+                object o = Activator.CreateInstance(t);
+                //gets all properties
+                PropertyInfo[] props = o.GetType().GetProperties();
+
+                //foreach of the properties in class above, write out properties
+                //this is the header row
+                //sw.Write(string.Join(",", props.Select(d => d.Name).ToArray()) + newLine);
+
+                //this acts as datarow
+                //foreach (BetList item in list)
+                //{
+                    //this acts as datacolumn
+                    var row = string.Join(",", props.Select(d => item.GetType()
+                                                                    .GetProperty(d.Name)
+                                                                    .GetValue(item, null)
+                                                                    .ToString())
+                                                            .ToArray());
+                    sw.Write(row + newLine);
+
+               // }
+            }
+        }
     }
+
 }
 
 

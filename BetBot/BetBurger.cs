@@ -19,7 +19,9 @@ namespace BetBot
         //List<string> fileWriteResponses = new List<string>();
         List<IWebElement> jsonArbs = new List<IWebElement>();
         public static ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
+        
         public static ObservableCollection<BetList> tempBetList = new ObservableCollection<BetList>();
+        public static ObservableCollection<BetList> historyList = new ObservableCollection<BetList>();
         BetList simpleBet = new BetList();
         JToken j;
         string url;
@@ -34,6 +36,7 @@ namespace BetBot
         public static List<string> betTypesList = new List<string>();
         bool eqFlag = false;
 
+        
         public void ScrapBurger()
         {
             burgerMidas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(120);
@@ -121,7 +124,7 @@ namespace BetBot
                             simpleBet.coefChanged = false;
                             simpleBet.faultCounter = 0;
 
-                            if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown, simpleBet.coefChanged, simpleBet.faultCounter)))
+                            if (historyList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown, simpleBet.coefChanged, simpleBet.faultCounter)) || betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown, simpleBet.coefChanged, simpleBet.faultCounter)))
                             {
                                 //do nothing
                             }
