@@ -24,10 +24,12 @@ namespace BetBot
         public string betType { get; set; }
         public bool eqFlag { get; set; }
         public bool thrown { get; set; }
+        public bool coefChanged { get; set; }
+        public int faultCounter { get; set; }
 
         public BetList() { }
 
-        public BetList(string carbId, string ceventName, string cleague, string ccountryId, string cbetId, string cbookmakerId, string cparentDiv, string cchildDiv, string csportId, string csportName, string chome, string caway, string ckoef, string cbetType, bool ceqFlag, bool cthrown)
+        public BetList(string carbId, string ceventName, string cleague, string ccountryId, string cbetId, string cbookmakerId, string cparentDiv, string cchildDiv, string csportId, string csportName, string chome, string caway, string ckoef, string cbetType, bool ceqFlag, bool cthrown, bool ccoefChanged, int cfaultCounter)
         {
 
             arbId = carbId;
@@ -46,6 +48,8 @@ namespace BetBot
             betType = cbetType;
             eqFlag = ceqFlag;
             thrown = cthrown;
+            coefChanged = ccoefChanged;
+            faultCounter = cfaultCounter;
         }
 
         public bool Equals(BetList other)

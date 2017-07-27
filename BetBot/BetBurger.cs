@@ -6,8 +6,8 @@ using OpenQA.Selenium.Firefox;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
-
-
+using System.Windows;
+using System.Windows.Threading;
 
 namespace BetBot
 {
@@ -31,6 +31,7 @@ namespace BetBot
         List<int> betCompanyIndexes = new List<int>();
         List<string> betCompanyDivisions = new List<string>();
         List<string> divisionsList = new List<string>();
+        public static List<string> betTypesList = new List<string>();
         bool eqFlag = false;
 
         public void ScrapBurger()
@@ -40,19 +41,19 @@ namespace BetBot
             okCookieClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div/a[1]"));
             System.Threading.Thread.Sleep(1000);
             okCookieClick.Click();
-            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
-            prematchLinkClick.Click();
-            //LOGIN!
-            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[6]/a"));
-            //prematchLinkClick.Click();
-            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[1]/input"));
-            //prematchLinkClick.SendKeys("con.kokkinis@gmail.com");
-            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[2]/input"));
-            //prematchLinkClick.SendKeys("6983868418");
-            //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[4]/button"));
-            //prematchLinkClick.Click();
             //prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
             //prematchLinkClick.Click();
+            //LOGIN!
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[6]/a"));
+            prematchLinkClick.Click();
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[1]/input"));
+            prematchLinkClick.SendKeys("con.kokkinis@gmail.com");
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[2]/input"));
+            prematchLinkClick.SendKeys("6983868418");
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/div[1]/div[2]/div/div[1]/div/div/div/form/div[4]/button"));
+            prematchLinkClick.Click();
+            prematchLinkClick = burgerMidas.FindElement(By.XPath("html/body/header/div/nav/ul/li[2]/a"));
+            prematchLinkClick.Click();
         }
 
         public void DummyClick()
@@ -63,7 +64,8 @@ namespace BetBot
 
         public ObservableCollection<BetList> GetArbsToJson()
         {
-            //betList.Clear();
+            //Manual Refresh
+            // burgerMidas.Navigate().Refresh();
             responses.Clear();
             jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
             List<string[]> SplitedDivision = new List<string[]>();
@@ -89,6 +91,7 @@ namespace BetBot
                             responses.Add(response.bets[i]);
                             simpleBet.arbId = response.arb.id.ToString();
                             simpleBet.league = divisionsList[jj];
+                            //simpleBet.league = "Sweden.Sweden.Sweden Juniorallsvenskan";
                             SplitedDivision = SplitDivision(simpleBet.league);
                             simpleBet.parentDiv = SplitedDivision.First().ElementAt(0);
 
@@ -99,7 +102,7 @@ namespace BetBot
                             }
                             else
                             {
-                                simpleBet.childDiv = SplitedDivision.First().ElementAt(1).Replace(" ",string.Empty);
+                                simpleBet.childDiv = SplitedDivision.First().ElementAt(1).Replace(" ", string.Empty);
                                 jj++;
                             }
 
@@ -115,14 +118,24 @@ namespace BetBot
                             simpleBet.countryId = response.arb.country_id;
                             simpleBet.eqFlag = false;
                             simpleBet.thrown = false;
+                            simpleBet.coefChanged = false;
+                            simpleBet.faultCounter = 0;
 
-                            if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown)))
+                            if (betList.Contains(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown, simpleBet.coefChanged, simpleBet.faultCounter)))
                             {
-
+                                //do nothing
                             }
                             else
                             {
-                                betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown));
+                                if (betTypesList.Contains(simpleBet.betType))
+                                {
+                                    //Application.Current.Dispatcher.BeginInvoke(
+                                    //    DispatcherPriority.Background,
+                                    //    new Action(() =>
+                                    //    {
+                                    betList.Add(new BetList(simpleBet.arbId, simpleBet.eventName, simpleBet.league, simpleBet.countryId, simpleBet.betId, simpleBet.bookmakerId, simpleBet.parentDiv, simpleBet.childDiv, simpleBet.sportId, simpleBet.sportName, simpleBet.home, simpleBet.away, simpleBet.koef, simpleBet.betType, simpleBet.eqFlag, simpleBet.thrown, simpleBet.coefChanged, simpleBet.faultCounter));
+                                    //   }));
+                                }
                             }
                         }
                     }
@@ -146,13 +159,17 @@ namespace BetBot
                 words.Clear();
                 string str = divisions;
                 words.Add(str.Split(new[] { "." }, 2, StringSplitOptions.None));
+                if (words.First().ElementAt(1) == words.First().ElementAt(0))
+                {
+
+                }
 
 
             }
             else
             {
                 words.Add(divisions.Split('.'));
-             
+
             }
             return words;
         }

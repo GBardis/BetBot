@@ -52,6 +52,9 @@ namespace BetBot
             //FirefoxProfile p = new FirefoxProfile();
             //p.SetPreference("javascript.enabled", false);
             InitializeComponent();
+            BetBurger.betTypesList.Add("1X2-1()");
+            BetBurger.betTypesList.Add("1X2-X()");
+            BetBurger.betTypesList.Add("1X2-2()");
             // BindingOperations.EnableCollectionSynchronization(betList,lockObject);           
             dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
             dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -59,21 +62,16 @@ namespace BetBot
             this.DataContext = this;
             //driver.Manage().Window.Maximize();
             midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
-            IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
-            element.Click();
-            System.Threading.Thread.Sleep(1000);
-            IWebElement Odds = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/a"));
-            Odds.Click();
-            IWebElement hiddenList = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/div/div/a[2]"));
-            hiddenList.Click();
-            dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
-            foreach (string[] e in dictionary)
-            {
-                dict.Add(e[0].ToString(), e[1].ToString());
-            }
+
+            //dictionary = File.ReadLines(@"Football.csv").Select(line => line.Split(','));
+            //foreach (string[] e in dictionary)
+            //{
+            //    dict.Add(e[0].ToString(), e[1].ToString());
+            //}
             //BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
         }
+
+
 
         private async void dispatcherTimer_Tick(object sender, EventArgs e)
         {
@@ -99,19 +97,63 @@ namespace BetBot
         {
             for (int index = 0; index < betList.Count; index++)
             {
-                if (!betList[index].thrown)
+                if (!betList[index].thrown && !betList[index].coefChanged && betList[index].faultCounter <= 2)
                 {
                     clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
                     nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
                     clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
                     clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
-                    clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
+                    bool eventFound = clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
                     nav.closeAllOpenDivs(".gl-MarketGroup_Open");
                     clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
-                    Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
-                    placeMaxBet();
-                    betList[index].thrown = true;
+                    //Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
+                    //placeMaxBet();
+                    if (eventFound)
+                    {
+                        if (BetMap(betList[index].betType, betList[index].koef))
+                        {
+                            //if (placeMaxBet())
+                            //{
+                            //    betList[index].thrown = true;
+                            //}
+
+                            if (placeFifty())
+                            {
+                                betList[index].thrown = true;
+                            }
+                        }
+                        else
+                        {
+                            betList[index].coefChanged = true;
+                            betList[index].faultCounter++;
+                        }
+                    }
                 }
+            }
+        }
+
+        private bool BetMap(string betType, string koef)
+        {
+            bool betThrown = false;
+            switch (betType)
+            {
+                case "1X2-1()":
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[1]/span[2]", leftNav);
+                    return (betThrown) ? true : false;
+                case "1X2-X()":
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[2]/span[2]", leftNav);
+                    return (betThrown) ? true : false;
+
+                case "1X2-2()":
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[3]/span[2]", leftNav);
+                    return (betThrown) ? true : false;
+
+                //case "1X2-2()":
+                //    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div[3]", leftNav);
+                //    Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[3]/span[2]", leftNav);
+                //    break;
+                default:
+                    return false;
             }
         }
 
@@ -130,33 +172,54 @@ namespace BetBot
             var slowNavigation = Task.Factory.StartNew(() => burger.ScrapBurger());
             // burger.ScrapBurger();                      
             await slowNavigation;
+
+            //Connect to 365 and login!
+            midas.Navigate().GoToUrl("https://www.bet365.gr/en/");
+            IWebElement element = midas.FindElement(By.Id("TopPromotionButton"));
+            element.Click();
+            System.Threading.Thread.Sleep(1000);
+            IWebElement Odds = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/a"));
+            Odds.Click();
+            IWebElement hiddenList = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[2]/div[2]/div[3]/div/div/a[2]"));
+            hiddenList.Click();
+            //login
+            IWebElement UserNameText = midas.FindElement(By.CssSelector(".hm-Login_InputField"));
+            IWebElement PasswordText = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[1]/div[2]/div/div[2]/input[1]"));
+            UserNameText.SendKeys(userName365TextBox.Text);
+            PasswordText.Click();            
+            IWebElement PasswordText2 = midas.FindElement(By.XPath("html/body/div[1]/div/div[1]/div/div[1]/div[2]/div/div[2]/input[2]"));
+            PasswordText2.SendKeys(password365TextBox.Text);
+            IWebElement element2 = midas.FindElement(By.CssSelector(".hm-Login_LoginBtn"));
+            element2.Click();
+
+            //re-Enable button!
             btnNavigate.IsEnabled = true;
         }
 
-        private void clickResponse(string clickName, string path, divNav leftNav)
+        private bool clickResponse(string clickName, string path, divNav leftNav)
         {
             if (!leftNav.fetchLeftNav(clickName, path))
             {
-                //errorLabel.Content = clickName + " Not Found!";
+                return false;
             }
             else
             {
-                // errorLabel.Content = clickName;
+                return true;
             }
         }
 
-        private void Koef(string koef, string path, divNav leftNav)
+        private bool Koef(string koef, string path, divNav leftNav)
         {
             if (!leftNav.KoefToDouble(koef, path))
             {
-                // errorLabel.Content = koef + " Not Found!";
+                return false;
             }
             else
             {
-                // errorLabel.Content = koef;
+                return true;
             }
         }
-        private void placeMaxBet()
+        private bool placeMaxBet()
         {
             midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(300);
             IWebElement iframe;
@@ -164,22 +227,74 @@ namespace BetBot
             try
             {
                 iframe = midas.FindElement(By.TagName("iframe"));
-                midas.SwitchTo();
+                midas.SwitchTo().Frame(iframe);
                 element = midas.FindElement(By.XPath("html/body/div[1]/div/ul/li[3]/ul/li/div[3]/div[2]/span"));
                 if (element.Displayed)
                 {
                     element.Click();
-                }              
+                }
+
                 element = midas.FindElement(By.XPath("html/body/div[1]/div/ul/li[8]/a[2]/div"));
-                if (element.Displayed)
+                if (element.Displayed && !(element.Text == "Accept Changes"))
                 {
                     element.Click();
+                    midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                    midas.SwitchTo().ParentFrame();
+                    return true;
                 }
-                midas.SwitchTo().DefaultContent();
+                else
+                {
+                    midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                    midas.SwitchTo().ParentFrame();
+                    return false;
+                }
+
             }
             catch (Exception)
             {
+                midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                midas.SwitchTo().ParentFrame();
+                return false;
+            }
 
+        }
+
+        private bool placeFifty()
+        {
+            midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(300);
+            IWebElement iframe;
+            IWebElement element;
+            try
+            {
+                iframe = midas.FindElement(By.TagName("iframe"));
+                midas.SwitchTo().Frame(iframe);
+                element = midas.FindElement(By.XPath("html/body/div[1]/div/ul/li[3]/ul/li/div[3]/div[1]/div[1]/input"));
+                if (element.Displayed)
+                {
+                    element.SendKeys("0.50");
+                }
+
+                element = midas.FindElement(By.XPath("html/body/div[1]/div/ul/li[8]/a[2]/div"));
+                if (element.Displayed && !(element.Text == "Accept Changes"))
+                {
+                    element.Click();
+                    midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                    midas.SwitchTo().ParentFrame();
+                    return true;
+                }
+                else
+                {
+                    midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                    midas.SwitchTo().ParentFrame();
+                    return false;
+                }
+
+            }
+            catch (Exception)
+            {
+                midas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+                midas.SwitchTo().ParentFrame();
+                return false;
             }
 
         }

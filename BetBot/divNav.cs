@@ -10,7 +10,7 @@ namespace BetBot
     class divNav : Navigation
     {
         List<IWebElement> elements = new List<IWebElement>();
-
+        IWebElement element;
         public bool fetchLeftNav(string clickName, string path)
         {
             //elements = MainWindow.driver.FindElements(By.XPath(""));
@@ -44,34 +44,28 @@ namespace BetBot
         public bool KoefToDouble(string koef, string path)
         {
             double koefDouble = Math.Round(Convert.ToDouble(koef), 2);
-            elements = MainWindow.midas.FindElements(By.XPath(path)).ToList<IWebElement>();
-
-            if (elements.Count > 0)
+            element = MainWindow.midas.FindElement(By.XPath(path));
+            try
             {
-                foreach (IWebElement element in elements)
+                double elementDouble = Math.Round(Convert.ToDouble(element.Text), 2);
+                if (koefDouble == elementDouble)
                 {
-                    try
-                    {
-                        double elementDouble = Math.Round(Convert.ToDouble(element.Text), 2);
-                        if (koefDouble == elementDouble)
-                        {
-                            element.Click();
-                            break;
-                        }
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
+                    element.Click();
+                    return true;
                 }
-                return true;
+                else
+                {
+
+                    return false;
+                }
             }
-            else
+            catch (Exception)
             {
                 return false;
             }
         }
+
+
 
         public string MinifyElement(string element)
         {
