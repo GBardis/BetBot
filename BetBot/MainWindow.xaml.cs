@@ -69,7 +69,7 @@ namespace BetBot
             {
                 BetBurger.historyList.Add(new BetList(e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12], e[13], Convert.ToBoolean(e[14]), Convert.ToBoolean(e[15]), Convert.ToBoolean(e[16]), Convert.ToInt32(e[17])));
             }
-            
+
             //BetBurger.betList.CollectionChanged += new NotifyCollectionChangedEventHandler(CollectionChangedEvent);
         }
 
@@ -97,7 +97,7 @@ namespace BetBot
 
         private void SiteClicker()
         {
-            
+
             for (int index = 0; index < betList.Count; index++)
             {
                 if (!betList[index].thrown && !betList[index].coefChanged && betList[index].faultCounter <= 2 /*&& !BetBurger.historyList[index].thrown && !BetBurger.historyList[index].coefChanged && BetBurger.historyList[index].faultCounter <= 2*/)
@@ -133,7 +133,7 @@ namespace BetBot
                     }
                     CreateCSVFromGenericList(betList, "C:\\Users\\John\\Documents\\Visual Studio 2017\\Projects\\BetBot\\BetBot\\bin\\Debug\\logs\\LOG.txt", betList[index]);
                 }
-            }            
+            }
         }
 
         private bool BetMap(string betType, string koef)
@@ -317,7 +317,7 @@ namespace BetBot
             BetBurger.betList.Clear();
         }
 
-        public static void CreateCSVFromGenericList<BetList>(ObservableCollection<BetList> list, string csvCompletePath,BetList item)
+        public static void CreateCSVFromGenericList<BetList>(ObservableCollection<BetList> list, string csvCompletePath, BetList item)
         {
             if (list == null || list.Count == 0) return;
 
@@ -327,9 +327,9 @@ namespace BetBot
 
             if (!Directory.Exists(System.IO.Path.GetDirectoryName(csvCompletePath))) Directory.CreateDirectory(System.IO.Path.GetDirectoryName(csvCompletePath));
 
-           // if (!File.Exists(csvCompletePath)) File.Create(csvCompletePath);
+            // if (!File.Exists(csvCompletePath)) File.Create(csvCompletePath);
 
-            using (var sw = new StreamWriter(csvCompletePath,true))
+            using (var sw = new StreamWriter(csvCompletePath, true))
             {
                 //make a new instance of the class name we figured out to get its props
                 object o = Activator.CreateInstance(t);
@@ -343,15 +343,15 @@ namespace BetBot
                 //this acts as datarow
                 //foreach (BetList item in list)
                 //{
-                    //this acts as datacolumn
-                    var row = string.Join(",", props.Select(d => item.GetType()
-                                                                    .GetProperty(d.Name)
-                                                                    .GetValue(item, null)
-                                                                    .ToString())
-                                                            .ToArray());
-                    sw.Write(row + newLine);
+                //this acts as datacolumn
+                var row = string.Join(",", props.Select(d => item.GetType()
+                                                                .GetProperty(d.Name)
+                                                                .GetValue(item, null)
+                                                                .ToString())
+                                                        .ToArray());
+                sw.Write(row + newLine);
 
-               // }
+                // }
             }
         }
     }

@@ -19,7 +19,7 @@ namespace BetBot
         //List<string> fileWriteResponses = new List<string>();
         List<IWebElement> jsonArbs = new List<IWebElement>();
         public static ObservableCollection<BetList> betList = new ObservableCollection<BetList>();
-        
+
         public static ObservableCollection<BetList> tempBetList = new ObservableCollection<BetList>();
         public static ObservableCollection<BetList> historyList = new ObservableCollection<BetList>();
         BetList simpleBet = new BetList();
@@ -36,7 +36,7 @@ namespace BetBot
         public static List<string> betTypesList = new List<string>();
         bool eqFlag = false;
 
-        
+
         public void ScrapBurger()
         {
             burgerMidas.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(120);
