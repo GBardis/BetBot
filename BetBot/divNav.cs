@@ -44,9 +44,10 @@ namespace BetBot
         public bool KoefToDouble(string koef, string path)
         {
             double koefDouble = Math.Round(Convert.ToDouble(koef), 2);
-            element = MainWindow.midas.FindElement(By.XPath(path));
+            
             try
             {
+                element = MainWindow.midas.FindElement(By.XPath(path));
                 double elementDouble = Math.Round(Convert.ToDouble(element.Text), 2);
                 if (koefDouble == elementDouble)
                 {
@@ -79,6 +80,7 @@ namespace BetBot
             b.Replace("&", string.Empty);
             b.Replace("/", string.Empty);
             b.Replace(".", string.Empty);
+            b.Replace("ö", "o");
             return b.ToString();
         }
     }

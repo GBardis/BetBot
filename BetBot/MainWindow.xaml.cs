@@ -56,6 +56,23 @@ namespace BetBot
             BetBurger.betTypesList.Add("1X2-1()");
             BetBurger.betTypesList.Add("1X2-X()");
             BetBurger.betTypesList.Add("1X2-2()");
+            BetBurger.betTypesList.Add("DC-1X()");
+            BetBurger.betTypesList.Add("DC-X2()");
+            BetBurger.betTypesList.Add("DC-12()");
+            BetBurger.betTypesList.Add("OU-TO(2.5)");
+            BetBurger.betTypesList.Add("OU-TO(0.5)");
+            BetBurger.betTypesList.Add("OU-TO(1.5)");
+            BetBurger.betTypesList.Add("OU-TO(3.5)");
+            BetBurger.betTypesList.Add("OU-TO(4.5)");
+            BetBurger.betTypesList.Add("OU-TO(5.5)");
+            BetBurger.betTypesList.Add("OU-TO(6.5)");
+            BetBurger.betTypesList.Add("OU-TU(2.5)");
+            BetBurger.betTypesList.Add("OU-TU(0.5)");
+            BetBurger.betTypesList.Add("OU-TU(1.5)");
+            BetBurger.betTypesList.Add("OU-TU(3.5)");
+            BetBurger.betTypesList.Add("OU-TU(4.5)");
+            BetBurger.betTypesList.Add("OU-TU(5.5)");
+            BetBurger.betTypesList.Add("OU-TU(6.5)");
             // BindingOperations.EnableCollectionSynchronization(betList,lockObject);           
             dispatcherTimer.Interval = TimeSpan.FromSeconds(5);
             dispatcherTimer.Tick += dispatcherTimer_Tick;
@@ -105,10 +122,12 @@ namespace BetBot
                     clickResponse(betList[index].sportName, "html/body/div[1]/div/div[2]/div[1]/div/div[1]/div/div/div", leftNav);
                     nav.closeAllOpenDivs(".sm-Market_HeaderOpen");
                     clickResponse(betList[index].parentDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div", leftNav);
-                    clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav);
+                    if (!clickResponse(betList[index].childDiv, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div[1]/div[3]/div[2]/div/div[2]/div/div", leftNav))
+                    {
+                        betList[index].faultCounter++;
+                    }
                     bool eventFound = clickResponse(betList[index].eventName, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[2]/div/div[1]/div/div/div", leftNav);
-                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
-                    clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+
                     //Koef(betList[index].koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div/span[2]", leftNav);
                     //placeMaxBet();
                     if (eventFound)
@@ -142,20 +161,119 @@ namespace BetBot
             switch (betType)
             {
                 case "1X2-1()":
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
                     betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[1]/span[2]", leftNav);
                     return (betThrown) ? true : false;
                 case "1X2-X()":
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
                     betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[2]/span[2]", leftNav);
                     return (betThrown) ? true : false;
-
                 case "1X2-2()":
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Full Time Result", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
                     betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[3]/span[2]", leftNav);
                     return (betThrown) ? true : false;
-
-                //case "1X2-2()":
-                //    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div[3]", leftNav);
-                //    Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div/div[3]/span[2]", leftNav);
-                //    break;
+                case "DC-1X()":
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Double Chance", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div/div[1]/span[2]", leftNav);
+                    return (betThrown) ? true : false;
+                case "DC-X2()":
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Double Chance", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div/div[2]/span[2]", leftNav);
+                    return (betThrown) ? true : false;
+                case "DC-12()":
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Double Chance", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div/div[3]/span[2]", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(2.5)":            
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Goals Over/Under", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div[2]/div[2]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(2.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Goals Over/Under", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[3]/div[2]/div/div[3]/div[2]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(0.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[2]/div[2]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(0.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[3]/div[2]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(1.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[2]/div[3]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(1.5)":          
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[3]/div[3]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(3.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[2]/div[4]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(3.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[3]/div[4]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(4.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[2]/div[5]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(4.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[3]/div[5]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(5.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[2]/div[6]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(5.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[3]/div[6]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TO(6.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[2]/div[7]/span", leftNav);
+                    return (betThrown) ? true : false;
+                case "OU-TU(6.5)":
+                    clickResponse("Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[1]/div/div[2]/div/div", leftNav);
+                    nav.closeAllOpenDivs(".gl-MarketGroup_Open");
+                    clickResponse("Alternative Total Goals", "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[1]", leftNav);
+                    betThrown = Koef(koef, "html/body/div[1]/div/div[2]/div[1]/div/div[2]/div[2]/div/div[4]/div[2]/div/div[3]/div[7]/span", leftNav);
+                    return (betThrown) ? true : false;                
                 default:
                     return false;
             }
