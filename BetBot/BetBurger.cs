@@ -70,7 +70,15 @@ namespace BetBot
             //Manual Refresh
             // burgerMidas.Navigate().Refresh();
             responses.Clear();
-            jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
+            //Problem was here
+            try
+            {
+                jsonArbs = burgerMidas.FindElements(By.XPath("html/body/div[5]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div/div/div/div/div[1]/ul/li/div/div[1]/div/div[2]/div/div/div/div/div[4]/div/div/a[3]")).ToList<IWebElement>();
+            }
+            catch(Exception ex)
+            {
+
+            }            
             List<string[]> SplitedDivision = new List<string[]>();
             divisionsList.Clear();
             divisionsList = FindBetDivision();
@@ -157,7 +165,7 @@ namespace BetBot
             List<string[]> words = new List<string[]>();
             words.Add(divisions.Split('.'));
 
-            if (words.First().ElementAt(0) == "Sweden" || words.First().ElementAt(0) == "Europe" || words.First().ElementAt(0) == "Germany")
+            if (words.First().ElementAt(0) == "Sweden" || words.First().ElementAt(0) == "Europe" || words.First().ElementAt(0) == "Germany" || words.First().ElementAt(0) =="United Kingdom")
             {
                 words.Clear();
                 string str = divisions;
