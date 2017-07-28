@@ -1,0 +1,15 @@
+1e84a89161be3cafb56aeb661e9ab5f5,Toulouse v Osasuna,Europe. Europe Friendlies,1,284594225110,10,Europe,EuropeFriendlies,7,Soccer,Toulouse,Osasuna,2.2,DC-X2(),False,True,False,0
+9c1fc18537baf80a3b70fdd965a8b228,Carl Zeiss Jena v SC Fortuna Koln,Germany. Germany 3.Liga,6,284090478364,10,Germany,Germany3.Liga,7,Soccer,Carl Zeiss Jena,SC Fortuna Koln,1.75,DC-X2(),False,False,True,1
+5c713eb2efa8bb4b97426e21dab5cc92,Slask Wroclaw v Lechia Gdansk,Europe. Poland Ekstraklasa,63,283801177627,10,Europe,PolandEkstraklasa,7,Soccer,Slask Wroclaw,Lechia Gdansk,1.6,DC-1X(),False,True,False,0
+439168b1bad5f3115e1dc023a6666123,Shamrock Rovers v Bohemians Dublin,Rep of Ireland. League of Ireland Premier Division,78,284159188573,10,Rep of Ireland,LeagueofIrelandPremierDivision,7,Soccer,Shamrock Rovers,Bohemians Dublin,2.6,DC-X2(),False,True,False,0
+82145b01a244f00f4e4a84fa9e6f69d6,Ural v FC Ufa,Europe. Russia Premier League,28,284142936055,10,Europe,RussiaPremierLeague,7,Soccer,Ural,FC Ufa,1.55,DC-X2(),False,True,False,0
+28ce2c67eea455b02914b18d0e498b95,FC Brno v Banik Ostrava,Europe. Czech Republic First League,45,282017384662,10,Europe,CzechRepublicFirstLeague,7,Soccer,FC Brno,Banik Ostrava,1.85,DC-X2(),False,True,False,0
+ceb24c99331b0ba7b52b791ea4fe19df,Nimes v Reims,France. France Ligue 2,10,279821520431,10,France,FranceLigue2,7,Soccer,Nimes,Reims,1.66,DC-X2(),False,True,False,0
+03e90c365b95a7e65b9d37f2691ee35a,Paris FC v Clermont Foot,France. France Ligue 2,10,284647928155,10,France,FranceLigue2,7,Soccer,Paris FC,Clermont Foot,1.53,DC-1X(),False,True,False,0
+057bb18a3e8073e00e5443887df629e4,Toulouse v Osasuna,Europe. Europe Friendlies,1,284594225098,10,Europe,EuropeFriendlies,7,Soccer,Toulouse,Osasuna,1.85,OU-TU(2.5),False,False,True,1
+f73faa9fb0f9ee087c71e0ce47d99fc8,Termalica BB Nieciecza v Zaglebie Lubin,Europe. Poland Ekstraklasa,63,283801066849,10,Europe,PolandEkstraklasa,7,Soccer,Termalica BB Nieciecza,Zaglebie Lubin,1.61,DC-X2(),False,True,False,0
+ac398a9dc92764e19618d38984161fd5,Werder Bremen v West Ham,Europe. Elite Club Friendlies,1,284596322584,10,Europe,EliteClubFriendlies,7,Soccer,Werder Bremen,West Ham,1.5,DC-1X(),False,True,False,0
+c1acdbcdb96dbd3d90d8a539ec410ef6,Slask Wroclaw v Lechia Gdansk,Europe. Poland Ekstraklasa,63,283801177480,10,Europe,PolandEkstraklasa,7,Soccer,Slask Wroclaw,Lechia Gdansk,1.55,DC-X2(),False,True,False,0
+dedd58a0b54bbe122f481a6a629a7ce8,US Orleans 45 v Nancy,France. France Ligue 2,10,279964066049,10,France,FranceLigue2,7,Soccer,US Orleans 45,Nancy,1.53,DC-1X(),False,True,False,0
+209baa2e7923d0df7d73964480fb618e,Sonderjyske v FC Helsingor,Denmark. Denmark Superligaen,4,283997387362,10,Denmark,DenmarkSuperligaen,7,Soccer,Sonderjyske,FC Helsingor,2.6,DC-X2(),False,True,False,0
+bee031f3faa2efce72ab04dfcca91028,NK Lokomotiva Zagreb v NK Rudes,Europe. Croatia 1.HNL,44,284735389318,10,Europe,Croatia1.HNL,7,Soccer,NK Lokomotiva Zagreb,NK Rudes,2.37,DC-X2(),False,True,False,0
